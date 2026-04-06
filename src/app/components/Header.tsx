@@ -14,6 +14,9 @@ export function Header() {
     if (path === '/my-projects') {
       return location.pathname === '/my-projects';
     }
+    if (path === '/discover') {
+      return location.pathname === '/discover';
+    }
     return location.pathname === path;
   };
   
@@ -28,6 +31,16 @@ export function Header() {
         </Link>
         
         <nav className="flex items-center gap-1">
+          <Link
+            to="/discover"
+            className={`px-3 py-1.5 text-[13px] font-medium rounded-md transition-colors ${
+              isActive('/discover')
+                ? 'bg-gray-100 text-gray-900'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+            }`}
+          >
+            Discover
+          </Link>
           <Link
             to="/find-collaborators"
             className={`px-3 py-1.5 text-[13px] font-medium rounded-md transition-colors ${

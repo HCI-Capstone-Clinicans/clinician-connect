@@ -6,11 +6,16 @@ import MyProfile from "./pages/MyProfile";
 import MyProjects from "./pages/MyProjects";
 import SkillsMap from "./pages/SkillsMap";
 import ProfileView from "./pages/ProfileView";
+import Discover from "./pages/Discover";
 
 export const router = createBrowserRouter([
   {
     path: "/",
     element: <FindProjects />,
+  },
+  {
+    path: "/discover",
+    element: <Discover />,
   },
   {
     path: "/find-projects",

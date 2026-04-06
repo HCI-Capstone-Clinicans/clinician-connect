@@ -1,8 +1,8 @@
 import { Header } from "../components/Header";
 import { UserCircle2, Pencil, FileText, Mail, MapPin, Clock } from "lucide-react";
-import imgProfile from "figma:asset/1a8e8f1388acd7e29af0518ac07ccba9821174d6.png";
-import imgProject from "figma:asset/58fc0ac8e1ce3bfeee1106e5418571c76bcc020d.png";
-import imgResume from "figma:asset/eea162a3bdec95f2e78582620862a4027b240df8.png";
+import imgProfile from "../../assets/1a8e8f1388acd7e29af0518ac07ccba9821174d6.png";
+import imgProject from "../../assets/58fc0ac8e1ce3bfeee1106e5418571c76bcc020d.png";
+import imgResume from "../../assets/eea162a3bdec95f2e78582620862a4027b240df8.png";
 
 export default function MyProfile() {
   const skills = [

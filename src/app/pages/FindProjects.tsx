@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router";
 import { Header } from "../components/Header";
 import { Search, ChevronDown, MapPin, Bookmark, TrendingUp, X } from "lucide-react";
-import imgRobot from "figma:asset/0dd2934842d6fa9897708ea0e164b300c59f584e.png";
+import imgRobot from "../../assets/0dd2934842d6fa9897708ea0e164b300c59f584e.png";
 import { MatchExplanation } from "../components/MatchExplanation";
 
 interface Project {

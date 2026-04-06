@@ -1,9 +1,9 @@
 import { Header } from "../components/Header";
 import { Link } from "react-router";
 import { MapPin, ExternalLink, TrendingUp, Clock } from "lucide-react";
-import imgRobot1 from "figma:asset/ddae6b8d5d02b2088350f4841c6924acbca5d8f7.png";
-import imgRobot2 from "figma:asset/83df25dac5dc5e2ced674c21a91028ff1d2960ae.png";
-import imgLogo from "figma:asset/783f2c42ea769440e177775b6794f454354e65fd.png";
+import imgRobot1 from "../../assets/ddae6b8d5d02b2088350f4841c6924acbca5d8f7.png";
+import imgRobot2 from "../../assets/83df25dac5dc5e2ced674c21a91028ff1d2960ae.png";
+import imgLogo from "../../assets/783f2c42ea769440e177775b6794f454354e65fd.png";
 import { useState } from "react";
 import { MatchExplanation } from "../components/MatchExplanation";
 

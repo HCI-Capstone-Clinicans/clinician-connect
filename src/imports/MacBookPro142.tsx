@@ -1,6 +1,6 @@
 import svgPaths from "./svg-yn7gff6qu0";
-import imgScreenshot20260311At121845Pm2 from "figma:asset/5c4e5a4412b7212abd90b73b121258a005bcc9c1.png";
-import imgImage7 from "figma:asset/0dd2934842d6fa9897708ea0e164b300c59f584e.png";
+import imgScreenshot20260311At121845Pm2 from "../../assets/5c4e5a4412b7212abd90b73b121258a005bcc9c1.png";
+import imgImage7 from "../../assets/0dd2934842d6fa9897708ea0e164b300c59f584e.png";
 
 function Logo() {
   return (

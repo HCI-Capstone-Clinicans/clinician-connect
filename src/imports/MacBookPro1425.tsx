@@ -1,6 +1,6 @@
 import svgPaths from "./svg-yq8eocyhjj";
-import imgRectangle13 from "figma:asset/9413ba0db7fd4497be1e97294806a8143016fe86.png";
-import imgRectangle14 from "figma:asset/759e6cedb45da0ad6f8fbabfcb3e19583dd2b237.png";
+import imgRectangle13 from "../../assets/9413ba0db7fd4497be1e97294806a8143016fe86.png";
+import imgRectangle14 from "../../assets/759e6cedb45da0ad6f8fbabfcb3e19583dd2b237.png";
 
 function Logo() {
   return (

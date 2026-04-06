@@ -1,7 +1,7 @@
 import svgPaths from "./svg-jwnafuzfci";
-import imgImage10 from "figma:asset/783f2c42ea769440e177775b6794f454354e65fd.png";
-import imgImageRoboDogPrototype from "figma:asset/ddae6b8d5d02b2088350f4841c6924acbca5d8f7.png";
-import imgRectangle12 from "figma:asset/83df25dac5dc5e2ced674c21a91028ff1d2960ae.png";
+import imgImage10 from "../../assets/783f2c42ea769440e177775b6794f454354e65fd.png";
+import imgImageRoboDogPrototype from "../../assets/ddae6b8d5d02b2088350f4841c6924acbca5d8f7.png";
+import imgRectangle12 from "../../assets/83df25dac5dc5e2ced674c21a91028ff1d2960ae.png";
 
 function Container() {
   return (

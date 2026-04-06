@@ -1,7 +1,7 @@
 import svgPaths from "./svg-vultdylvr2";
-import imgRectangle12 from "figma:asset/ddae6b8d5d02b2088350f4841c6924acbca5d8f7.png";
-import imgRectangle13 from "figma:asset/c1723e711714dd180e9890511514930b6856cfb4.png";
-import imgRectangle14 from "figma:asset/83df25dac5dc5e2ced674c21a91028ff1d2960ae.png";
+import imgRectangle12 from "../../assets/ddae6b8d5d02b2088350f4841c6924acbca5d8f7.png";
+import imgRectangle13 from "../../assets/c1723e711714dd180e9890511514930b6856cfb4.png";
+import imgRectangle14 from "../../assets/83df25dac5dc5e2ced674c21a91028ff1d2960ae.png";
 
 function Logo() {
   return (

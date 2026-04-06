@@ -1,10 +1,10 @@
 import { Header } from "../components/Header";
 import { Link } from "react-router";
 import { Mail, Phone, Award, CheckCircle2, TrendingUp, ArrowLeft, Clock } from "lucide-react";
-import imgProfile from "figma:asset/9413ba0db7fd4497be1e97294806a8143016fe86.png";
-import imgProject1 from "figma:asset/50ea0122d65dbf98475b5bcd3be009ec20788d72.png";
-import imgProject2 from "figma:asset/9b50c70f59b6a8d251cb854d643ae19e2b09f1ee.png";
-import imgResume from "figma:asset/63c954fdc052bbdee5ea11e1d6c367589196bb22.png";
+import imgProfile from "../../assets/9413ba0db7fd4497be1e97294806a8143016fe86.png";
+import imgProject1 from "../../assets/50ea0122d65dbf98475b5bcd3be009ec20788d72.png";
+import imgProject2 from "../../assets/9b50c70f59b6a8d251cb854d643ae19e2b09f1ee.png";
+import imgResume from "../../assets/63c954fdc052bbdee5ea11e1d6c367589196bb22.png";
 
 export default function ProfileView() {
   const skills = [

@@ -1,5 +1,5 @@
 import svgPaths from "./svg-830edlw4q5";
-import imgImage7 from "figma:asset/0dd2934842d6fa9897708ea0e164b300c59f584e.png";
+import imgImage7 from "../../assets/0dd2934842d6fa9897708ea0e164b300c59f584e.png";
 
 function Logo() {
   return (

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import imgCarrollLabs from "../../assets/783f2c42ea769440e177775b6794f454354e65fd.png";
 import { Link, useNavigate, useParams } from "react-router";
 import { Header } from "../components/Header";
 import { ArrowLeft, MapPin, TrendingUp } from "lucide-react";
@@ -110,7 +111,7 @@ export default function SkillsMap() {
               </div>
               <div className="flex items-center gap-2 mt-2">
                 <img 
-                  src="figma:asset/783f2c42ea769440e177775b6794f454354e65fd.png" 
+                  src={imgCarrollLabs}
                   alt="Carroll Labs"
                   className="w-8 h-8 object-cover rounded"
                 />
