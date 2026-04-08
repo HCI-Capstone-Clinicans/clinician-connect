@@ -30,13 +30,14 @@ interface ProjectData {
   location: string;
   status: string;
   startDate: string;
+  lastUpdated: string;
   teamSize: number;
   matchPercentage: number;
   overview: string[];
   researchAreas: string[];
-  highlightAreas: string[];
+  highlightAreas: { label: string; reason: string }[];
   lookingFor: string[];
-  highlightLookingFor: string[];
+  highlightLookingFor: { label: string; reason: string }[];
   teamMembers: TeamMember[];
   teamMeetings: TeamMeeting[];
   relatedProjects: { name: string; description: string; id: string }[];
@@ -51,7 +52,8 @@ const projectsData: Record<string, ProjectData> = {
     lab: "Carroll Labs",
     location: "UH Cleveland Medical Center",
     status: "Prototype Development",
-    startDate: "August 2025 — Ongoing",
+    startDate: "August 2025",
+    lastUpdated: "March 2026",
     teamSize: 4,
     matchPercentage: 87,
     overview: [
@@ -59,9 +61,15 @@ const projectsData: Record<string, ProjectData> = {
       "The research combines expertise from robotics engineering, human-robot interaction, and clinical practice to create tools that enhance surgical precision while maintaining the human element critical to patient care.",
     ],
     researchAreas: ["Robotics", "Human-Robot Interaction", "Surgery Assistance", "Medical Devices", "UX Research"],
-    highlightAreas: ["Human-Robot Interaction", "Medical Devices"],
+    highlightAreas: [
+      { label: "Human-Robot Interaction", reason: "Matches your listed interest in Human-Robot Interaction" },
+      { label: "Medical Devices", reason: "Aligns with your Product Design and UX Research skills" },
+    ],
     lookingFor: ["Robotics Engineers", "Grant Writers", "Human-Robot Interaction Designer", "Service Designer"],
-    highlightLookingFor: ["Human-Robot Interaction Designer", "Service Designer"],
+    highlightLookingFor: [
+      { label: "Human-Robot Interaction Designer", reason: "Your HCI background directly fits this open role" },
+      { label: "Service Designer", reason: "Your Service Design skills match this open role" },
+    ],
     teamMembers: [
       { name: "Dr. Bryan Carroll", role: "Principal Investigator", expertise: "Dermatologic Surgery" },
       { name: "Daniel Kim", role: "Robotics Engineer", expertise: "Mechanical & Electronics Engineering" },
@@ -90,7 +98,8 @@ const projectsData: Record<string, ProjectData> = {
     lab: "Cleveland Art Labs",
     location: "UH Cleveland Medical Center",
     status: "Active Research",
-    startDate: "January 2025 — Ongoing",
+    startDate: "January 2025",
+    lastUpdated: "February 2026",
     teamSize: 5,
     matchPercentage: 30,
     overview: [
@@ -98,9 +107,14 @@ const projectsData: Record<string, ProjectData> = {
       "The project focuses on understanding the psychological and physical stressors experienced by primary caregivers and creating evidence-based digital interventions that support caregiver wellbeing and reduce burnout rates.",
     ],
     researchAreas: ["Caregiver Wellbeing", "Digital Health", "Human-Computer Interaction", "Mental Health", "UX Research"],
-    highlightAreas: ["Human-Computer Interaction", "Digital Health"],
+    highlightAreas: [
+      { label: "Human-Computer Interaction", reason: "Matches your listed interest in Human-Computer Interaction" },
+      { label: "Digital Health", reason: "Aligns with your UX Research skills in health contexts" },
+    ],
     lookingFor: ["UX Designers", "Mental Health Researchers", "Software Developers", "Data Analysts"],
-    highlightLookingFor: ["UX Designers", "Mental Health Researchers"],
+    highlightLookingFor: [
+      { label: "UX Designers", reason: "Your UX Design and Product Design skills fit this role" },
+    ],
     teamMembers: [
       { name: "Dr. Susan Stern", role: "Principal Investigator", expertise: "Caregiver Psychology" },
       { name: "Lisa Nguyen", role: "UX Researcher", expertise: "Human-Computer Interaction" },
@@ -130,7 +144,8 @@ const projectsData: Record<string, ProjectData> = {
     lab: "Biomedical Engineering Lab",
     location: "Case Western Reserve University",
     status: "Early Research",
-    startDate: "March 2025 — Ongoing",
+    startDate: "March 2025",
+    lastUpdated: "January 2026",
     teamSize: 3,
     matchPercentage: 68,
     overview: [
@@ -138,9 +153,14 @@ const projectsData: Record<string, ProjectData> = {
       "The research aims to design a robotic suturing system capable of adapting to varying tissue conditions in real time, reducing operation time and improving consistency in wound closure across a range of surgical contexts.",
     ],
     researchAreas: ["Robotics", "Computer Vision", "Medical Devices", "Biomedical Engineering", "Machine Learning"],
-    highlightAreas: ["Computer Vision", "Machine Learning"],
+    highlightAreas: [
+      { label: "Computer Vision", reason: "Aligns with your interest in technology-driven design" },
+      { label: "Machine Learning", reason: "Relevant to your experience with data-driven research methods" },
+    ],
     lookingFor: ["Computer Vision Engineers", "Robotics Researchers", "Clinical Advisors", "UX Designers"],
-    highlightLookingFor: ["Computer Vision Engineers", "UX Designers"],
+    highlightLookingFor: [
+      { label: "UX Designers", reason: "Your UX Design and prototyping skills fit this open role" },
+    ],
     teamMembers: [
       { name: "Dr. Rachel Kim", role: "Principal Investigator", expertise: "Biomedical Engineering & Robotics" },
       { name: "Thomas Lee", role: "Computer Vision Engineer", expertise: "Machine Learning & Image Processing" },
@@ -168,7 +188,8 @@ const projectsData: Record<string, ProjectData> = {
     lab: "Digital Health Innovation Lab",
     location: "Cleveland Clinic",
     status: "Active Development",
-    startDate: "October 2024 — Ongoing",
+    startDate: "October 2024",
+    lastUpdated: "March 2026",
     teamSize: 6,
     matchPercentage: 72,
     overview: [
@@ -176,9 +197,14 @@ const projectsData: Record<string, ProjectData> = {
       "The project leverages cutting-edge machine learning models to provide surgeons with real-time recommendations, anomaly detection, and post-operative outcome predictions, aiming to improve patient outcomes across a wide range of surgical specialties.",
     ],
     researchAreas: ["AI/ML", "Surgery Assistance", "Medical Devices", "Data Analytics", "Clinical Informatics"],
-    highlightAreas: ["AI/ML", "Surgery Assistance"],
+    highlightAreas: [
+      { label: "AI/ML", reason: "Aligns with your interest in technology-driven healthcare design" },
+      { label: "Surgery Assistance", reason: "Matches your listed interest in surgical assistance research" },
+    ],
     lookingFor: ["ML Engineers", "Clinical Data Scientists", "UX Researchers", "Software Engineers", "Clinical Advisors"],
-    highlightLookingFor: ["UX Researchers", "Clinical Data Scientists"],
+    highlightLookingFor: [
+      { label: "UX Researchers", reason: "Your UX Research background directly fits this open role" },
+    ],
     teamMembers: [
       { name: "Dr. Angela Foster", role: "Principal Investigator", expertise: "Clinical Informatics & AI" },
       { name: "Sam Okafor", role: "ML Engineer", expertise: "Deep Learning & Computer Vision" },
@@ -436,8 +462,8 @@ export default function ProjectDetail() {
                 </div>
               </div>
 
-              {/* Project Updates */}
-              <div className="space-y-4">
+              {/* Project Updates - only shown for RoboDog */}
+              {project.id === "robodog" && <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <h2 className="text-[11px] uppercase tracking-wide text-gray-500">Project Updates</h2>
@@ -490,7 +516,7 @@ export default function ProjectDetail() {
                     </div>
                   );
                 })}
-              </div>
+              </div>}
             </div>
 
             {/* Sidebar */}
@@ -502,6 +528,14 @@ export default function ProjectDetail() {
                   <div>
                     <div className="text-[11px] text-gray-500 mb-0.5">Status</div>
                     <div className="text-[13px] text-gray-900">{project.status}</div>
+                  </div>
+                  <div>
+                    <div className="text-[11px] text-gray-500 mb-0.5">Started</div>
+                    <div className="text-[13px] text-gray-900">{project.startDate}</div>
+                  </div>
+                  <div>
+                    <div className="text-[11px] text-gray-500 mb-0.5">Last Updated</div>
+                    <div className="text-[13px] text-gray-900">{project.lastUpdated}</div>
                   </div>
                   <div>
                     <div className="text-[11px] text-gray-500 mb-0.5">Institution</div>
@@ -522,18 +556,24 @@ export default function ProjectDetail() {
               <div className="bg-white border border-gray-200 rounded-lg p-5 space-y-4">
                 <h2 className="text-[11px] uppercase tracking-wide text-gray-500">Research Areas</h2>
                 <div className="flex flex-wrap gap-1.5">
-                  {project.researchAreas.map((area, idx) => (
-                    <span
-                      key={idx}
-                      className={`px-2 py-1 text-[11px] font-medium rounded border ${
-                        project.highlightAreas.includes(area)
-                          ? "bg-cyan-50 text-cyan-700 border-cyan-200"
-                          : "bg-gray-50 text-gray-700 border-gray-200"
-                      }`}
-                    >
-                      {area}
-                    </span>
-                  ))}
+                  {project.researchAreas.map((area, idx) => {
+                    const highlight = project.highlightAreas.find(h => h.label === area);
+                    return highlight ? (
+                      <div key={idx} className="relative group">
+                        <span className="px-2 py-1 text-[11px] font-medium rounded border bg-green-50 text-green-700 border-green-200 cursor-default">
+                          {area}
+                        </span>
+                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-10 w-52 px-3 py-2 bg-gray-900 text-white text-[11px] leading-snug rounded-md shadow-lg pointer-events-none">
+                          {highlight.reason}
+                          <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
+                        </div>
+                      </div>
+                    ) : (
+                      <span key={idx} className="px-2 py-1 text-[11px] font-medium rounded border bg-gray-50 text-gray-700 border-gray-200">
+                        {area}
+                      </span>
+                    );
+                  })}
                 </div>
               </div>
 
@@ -541,18 +581,24 @@ export default function ProjectDetail() {
               <div className="bg-white border border-gray-200 rounded-lg p-5 space-y-4">
                 <h2 className="text-[11px] uppercase tracking-wide text-gray-500">Looking For</h2>
                 <div className="flex flex-wrap gap-1.5">
-                  {project.lookingFor.map((item, idx) => (
-                    <span
-                      key={idx}
-                      className={`px-2 py-1 text-[11px] font-medium rounded border ${
-                        project.highlightLookingFor.includes(item)
-                          ? "bg-cyan-50 text-cyan-700 border-cyan-200"
-                          : "bg-gray-50 text-gray-700 border-gray-200"
-                      }`}
-                    >
-                      {item}
-                    </span>
-                  ))}
+                  {project.lookingFor.map((item, idx) => {
+                    const highlight = project.highlightLookingFor.find(h => h.label === item);
+                    return highlight ? (
+                      <div key={idx} className="relative group">
+                        <span className="px-2 py-1 text-[11px] font-medium rounded border bg-green-50 text-green-700 border-green-200 cursor-default">
+                          {item}
+                        </span>
+                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-10 w-52 px-3 py-2 bg-gray-900 text-white text-[11px] leading-snug rounded-md shadow-lg pointer-events-none">
+                          {highlight.reason}
+                          <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
+                        </div>
+                      </div>
+                    ) : (
+                      <span key={idx} className="px-2 py-1 text-[11px] font-medium rounded border bg-gray-50 text-gray-700 border-gray-200">
+                        {item}
+                      </span>
+                    );
+                  })}
                 </div>
               </div>
 
