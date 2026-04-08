@@ -1,10 +1,13 @@
 import { Header } from "../components/Header";
-import { UserCircle2, Pencil, FileText, Mail, MapPin, Clock } from "lucide-react";
+import { UserCircle2, Pencil, FileText, Mail, MapPin, Clock, Bookmark, X } from "lucide-react";
+import { Link } from "react-router";
+import { useBookmarks } from "../context/BookmarksContext";
 import imgProfile from "../../assets/1a8e8f1388acd7e29af0518ac07ccba9821174d6.png";
 import imgProject from "../../assets/58fc0ac8e1ce3bfeee1106e5418571c76bcc020d.png";
 import imgResume from "../../assets/eea162a3bdec95f2e78582620862a4027b240df8.png";
 
 export default function MyProfile() {
+  const { bookmarks, toggleBookmark } = useBookmarks();
   const skills = [
     "Product Design",
     "User Research",
@@ -189,6 +192,73 @@ export default function MyProfile() {
                   Currently working on the RoboDog project at University Hospitals Cleveland, where I bridge the gap between 
                   technology and clinical practice through user-centered design.
                 </p>
+              </div>
+
+              {/* Saved Projects */}
+              <div className="bg-white border border-gray-200 rounded-lg p-6 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-[11px] font-medium text-gray-500 uppercase tracking-wide">Saved Projects</h2>
+                    {bookmarks.length > 0 && (
+                      <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-gray-100 text-gray-600 rounded">
+                        {bookmarks.length}
+                      </span>
+                    )}
+                  </div>
+                  <Bookmark className="h-4 w-4 text-gray-400" />
+                </div>
+
+                {bookmarks.length === 0 ? (
+                  <div className="py-6 flex flex-col items-center text-center gap-2">
+                    <Bookmark className="h-8 w-8 text-gray-200" />
+                    <p className="text-[13px] text-gray-500">No saved projects yet</p>
+                    <p className="text-[12px] text-gray-400">Bookmark projects from the Find Projects page to save them here.</p>
+                    <Link
+                      to="/find-projects"
+                      className="mt-2 px-4 py-2 text-[12px] font-medium text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                    >
+                      Browse Projects
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {bookmarks.map((project) => (
+                      <div
+                        key={project.id}
+                        className="flex items-start justify-between gap-3 p-3 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors"
+                      >
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Link
+                              to={`/project/${project.id}`}
+                              className="text-[13px] font-semibold text-gray-900 hover:text-gray-700 transition-colors"
+                            >
+                              {project.name}
+                            </Link>
+                            <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-green-50 text-green-700 border border-green-200 rounded">
+                              {project.matchPercentage}% Match
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-gray-500 mb-2">{project.lab} · {project.location}</p>
+                          <div className="flex flex-wrap gap-1">
+                            {project.tags.slice(0, 3).map((tag, idx) => (
+                              <span key={idx} className="px-1.5 py-0.5 text-[10px] bg-gray-50 text-gray-600 border border-gray-200 rounded">
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => toggleBookmark(project)}
+                          title="Remove bookmark"
+                          className="p-1.5 hover:bg-gray-100 rounded transition-colors flex-shrink-0 mt-0.5"
+                        >
+                          <X className="h-3.5 w-3.5 text-gray-400" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* AI Insights */}

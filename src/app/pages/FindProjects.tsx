@@ -4,6 +4,7 @@ import { Header } from "../components/Header";
 import { Search, ChevronDown, MapPin, Bookmark, TrendingUp, X } from "lucide-react";
 import imgRobot from "../../assets/0dd2934842d6fa9897708ea0e164b300c59f584e.png";
 import { MatchExplanation } from "../components/MatchExplanation";
+import { useBookmarks } from "../context/BookmarksContext";
 
 interface Project {
   id: string;
@@ -26,6 +27,7 @@ export default function FindProjects() {
   const [selectedProximity, setSelectedProximity] = useState("");
   const [showMatchExplanation, setShowMatchExplanation] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const { isBookmarked, toggleBookmark } = useBookmarks();
 
   const projects: Project[] = [
     {
@@ -312,8 +314,19 @@ export default function FindProjects() {
                         </div>
                         <p className="text-[13px] text-gray-600">{project.lab}</p>
                       </div>
-                      <button className="p-2 hover:bg-gray-100 rounded-md transition-colors">
-                        <Bookmark className="h-4 w-4 text-gray-400" />
+                      <button
+                        onClick={() => toggleBookmark({
+                          id: project.id,
+                          name: project.name,
+                          lab: project.lab,
+                          location: project.location,
+                          tags: project.tags,
+                          matchPercentage: project.matchPercentage,
+                        })}
+                        title={isBookmarked(project.id) ? "Remove bookmark" : "Save to profile"}
+                        className="p-2 hover:bg-gray-100 rounded-md transition-colors"
+                      >
+                        <Bookmark className={`h-4 w-4 transition-colors ${isBookmarked(project.id) ? "fill-gray-900 text-gray-900" : "text-gray-400"}`} />
                       </button>
                     </div>
 

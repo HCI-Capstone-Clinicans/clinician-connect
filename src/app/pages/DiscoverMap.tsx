@@ -314,7 +314,7 @@ export default function DiscoverMap({ intakeData, onEditFilters }: DiscoverMapPr
     return (
       <div 
         className={`rounded-full border-2 border-white shadow-lg cursor-pointer transition-transform hover:scale-125 ${
-          isSelected ? 'ring-4 ring-orange-400' : ''
+          isSelected ? 'ring-4 ring-gray-700' : ''
         }`}
         style={{ 
           width: `${size}px`, 
@@ -355,7 +355,7 @@ export default function DiscoverMap({ intakeData, onEditFilters }: DiscoverMapPr
                   onClick={() => setMatchType('exact')}
                   className={`flex-1 px-4 py-2.5 rounded-lg font-medium text-sm transition-all ${
                     matchType === 'exact'
-                      ? 'bg-gradient-to-r from-orange-500 to-rose-500 text-white shadow-md'
+                      ? 'bg-gray-900 text-white'
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
@@ -366,7 +366,7 @@ export default function DiscoverMap({ intakeData, onEditFilters }: DiscoverMapPr
                   onClick={() => setMatchType('adjacent')}
                   className={`flex-1 px-4 py-2.5 rounded-lg font-medium text-sm transition-all ${
                     matchType === 'adjacent'
-                      ? 'bg-gradient-to-r from-orange-500 to-rose-500 text-white shadow-md'
+                      ? 'bg-gray-900 text-white'
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
@@ -377,13 +377,13 @@ export default function DiscoverMap({ intakeData, onEditFilters }: DiscoverMapPr
 
               {/* Quick Stats */}
               <div className="grid grid-cols-2 gap-3">
-                <div className="p-3 bg-gradient-to-br from-orange-50 to-rose-50 rounded-lg">
+                <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg">
                   <div className="text-2xl font-bold text-gray-900">
                     {collaboratorsWithScores.length}
                   </div>
                   <div className="text-xs text-gray-600">Collaborators</div>
                 </div>
-                <div className="p-3 bg-gradient-to-br from-amber-50 to-orange-50 rounded-lg">
+                <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg">
                   <div className="text-2xl font-bold text-gray-900">
                     {collaboratorsWithScores.filter(c => c.matchScore > 70).length}
                   </div>
@@ -460,8 +460,8 @@ export default function DiscoverMap({ intakeData, onEditFilters }: DiscoverMapPr
               </div>
 
               {matchType === 'adjacent' && displayedCollaborators.length < collaboratorsWithScores.length && (
-                <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-                  <p className="text-xs text-amber-800">
+                <div className="mb-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                  <p className="text-xs text-gray-600">
                     <strong>Adjacent mode:</strong> Showing top {displayedCollaborators.length} best matches out of {collaboratorsWithScores.length} total
                   </p>
                 </div>
@@ -479,8 +479,8 @@ export default function DiscoverMap({ intakeData, onEditFilters }: DiscoverMapPr
                     whileHover={{ scale: 1.02 }}
                     className={`w-full p-4 rounded-xl border-2 transition-all text-left ${
                       selectedCollaborator?.id === collab.id
-                        ? 'border-orange-400 bg-orange-50 shadow-md'
-                        : 'border-gray-200 hover:border-orange-200 bg-white'
+                        ? 'border-gray-900 bg-gray-50 shadow-sm'
+                        : 'border-gray-200 hover:border-gray-300 bg-white'
                     }`}
                   >
                     <div className="flex items-start gap-3 mb-2">
@@ -567,12 +567,12 @@ export default function DiscoverMap({ intakeData, onEditFilters }: DiscoverMapPr
           <div className="space-y-1.5">
             <div className="flex items-center gap-2">
               <div className="relative w-4 h-4">
-                <div className="absolute inset-0 rounded-full bg-orange-400 opacity-30 blur-sm" />
-                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-orange-500 to-rose-500 border border-white flex items-center justify-center">
+                <div className="absolute inset-0 rounded-full bg-gray-600 opacity-20 blur-sm" />
+                <div className="absolute inset-0 rounded-full bg-gray-900 border border-white flex items-center justify-center">
                   <Navigation className="h-2 w-2 text-white" style={{ transform: 'rotate(45deg)' }} />
                 </div>
               </div>
-              <span className="text-xs text-orange-700 font-semibold">Your Location</span>
+              <span className="text-xs text-gray-700 font-semibold">Your Location</span>
             </div>
             <div className="flex items-center gap-2 pt-1 border-t border-gray-200 mt-1.5">
               <div className="w-3 h-3 rounded-full bg-blue-500" />
@@ -593,10 +593,10 @@ export default function DiscoverMap({ intakeData, onEditFilters }: DiscoverMapPr
               <span className="text-xs text-gray-600">Institutions</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-gradient-to-br from-cyan-500 to-blue-600 rounded flex items-center justify-center">
+              <div className="w-4 h-4 bg-slate-700 rounded flex items-center justify-center">
                 <Building2 className="h-2.5 w-2.5 text-white" />
               </div>
-              <span className="text-xs text-cyan-700 font-semibold">UH Hospitals</span>
+              <span className="text-xs text-gray-700 font-semibold">UH Hospitals</span>
             </div>
           </div>
         </div>
@@ -612,10 +612,10 @@ export default function DiscoverMap({ intakeData, onEditFilters }: DiscoverMapPr
         >
           <div className="relative">
             <Navigation 
-              className="h-6 w-6 text-orange-600 group-hover:text-orange-700 transition-colors" 
+              className="h-6 w-6 text-gray-600 group-hover:text-gray-800 transition-colors" 
               style={{ transform: 'rotate(45deg)' }} 
             />
-            <div className="absolute inset-0 rounded-full bg-orange-400 opacity-0 group-hover:opacity-20 blur-sm transition-opacity" />
+            <div className="absolute inset-0 rounded-full bg-gray-400 opacity-0 group-hover:opacity-10 blur-sm transition-opacity" />
           </div>
         </button>
 
@@ -740,9 +740,9 @@ export default function DiscoverMap({ intakeData, onEditFilters }: DiscoverMapPr
               onMouseLeave={() => setHoveredMarker(null)}
             >
               {/* Outer pulsing circle */}
-              <div className="absolute inset-0 rounded-full bg-orange-400 opacity-30 blur-md animate-pulse" />
+              <div className="absolute inset-0 rounded-full bg-gray-600 opacity-20 blur-md animate-pulse" />
               {/* Middle circle */}
-              <div className="absolute rounded-full bg-gradient-to-br from-orange-400 to-rose-400 opacity-40" 
+              <div className="absolute rounded-full bg-gray-500 opacity-25" 
                 style={{ 
                   width: '36px', 
                   height: '36px',
@@ -751,7 +751,7 @@ export default function DiscoverMap({ intakeData, onEditFilters }: DiscoverMapPr
                 }} 
               />
               {/* Main marker */}
-              <div className="absolute rounded-full bg-gradient-to-br from-orange-500 to-rose-500 border-3 border-white shadow-2xl flex items-center justify-center cursor-pointer hover:scale-110 transition-transform"
+              <div className="absolute rounded-full bg-gray-900 border-2 border-white shadow-2xl flex items-center justify-center cursor-pointer hover:scale-110 transition-transform"
                 style={{ 
                   width: '32px', 
                   height: '32px',
@@ -766,9 +766,9 @@ export default function DiscoverMap({ intakeData, onEditFilters }: DiscoverMapPr
               {/* Tooltip */}
               {hoveredMarker === 'user-location' && (
                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 pointer-events-none z-50">
-                  <div className="bg-gradient-to-r from-orange-600 to-rose-600 text-white text-xs px-4 py-3 rounded-lg shadow-2xl whitespace-nowrap">
+                  <div className="bg-gray-900 text-white text-xs px-4 py-3 rounded-lg shadow-2xl whitespace-nowrap">
                     <div className="font-semibold text-sm">Your Location</div>
-                    <div className="text-orange-100">
+                    <div className="text-gray-300">
                       Center of search area
                     </div>
                   </div>
@@ -780,7 +780,7 @@ export default function DiscoverMap({ intakeData, onEditFilters }: DiscoverMapPr
           {/* Search Radius Circle Overlay */}
           <Overlay anchor={userLocation as [number, number]} offset={[0, 0]}>
             <div 
-              className="rounded-full border-4 border-orange-400 bg-orange-100 opacity-20 pointer-events-none"
+              className="rounded-full border-2 border-gray-400 bg-gray-200 opacity-20 pointer-events-none"
               style={{
                 width: `${radiusFilter * Math.pow(2, mapZoom - 10)}px`,
                 height: `${radiusFilter * Math.pow(2, mapZoom - 10)}px`,
@@ -854,7 +854,7 @@ export default function DiscoverMap({ intakeData, onEditFilters }: DiscoverMapPr
                     {selectedCollaborator.topicAreas.map((topic, idx) => (
                       <span
                         key={idx}
-                        className="px-3 py-1 bg-orange-50 text-orange-700 text-sm rounded-md border border-orange-200"
+                        className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-md"
                       >
                         {topic}
                       </span>
@@ -876,10 +876,10 @@ export default function DiscoverMap({ intakeData, onEditFilters }: DiscoverMapPr
                   </div>
                 </div>
 
-                <div className="mb-6 p-4 bg-amber-50 rounded-lg flex items-center gap-3">
-                  <Clock className="h-5 w-5 text-amber-600" />
+                <div className="mb-6 p-4 bg-gray-50 border border-gray-200 rounded-lg flex items-center gap-3">
+                  <Clock className="h-5 w-5 text-gray-500" />
                   <div>
-                    <div className="text-xs text-amber-700 mb-0.5">Availability</div>
+                    <div className="text-xs text-gray-500 mb-0.5">Availability</div>
                     <div className="text-sm font-medium text-gray-900">
                       {selectedCollaborator.availability.charAt(0).toUpperCase() + selectedCollaborator.availability.slice(1).replace('-', ' ')}
                     </div>
@@ -887,7 +887,7 @@ export default function DiscoverMap({ intakeData, onEditFilters }: DiscoverMapPr
                 </div>
 
                 <div className="space-y-3">
-                  <button className="w-full px-6 py-3 bg-gradient-to-r from-orange-500 to-rose-500 text-white font-semibold rounded-lg hover:shadow-lg transition-all flex items-center justify-center gap-2">
+                  <button className="w-full px-6 py-3 bg-gray-900 text-white font-semibold rounded-lg hover:bg-gray-800 transition-colors flex items-center justify-center gap-2">
                     <Mail className="h-5 w-5" />
                     Connect
                   </button>

@@ -7,6 +7,7 @@ import { VennDiagram4People } from "../components/VennDiagram4People";
 import { VennDiagram5People } from "../components/VennDiagram5People";
 import { VennDiagramDetailed } from "../components/VennDiagramDetailed";
 import { MatchExplanation } from "../components/MatchExplanation";
+import { MatchedTag } from "../components/MatchedTag";
 
 export default function SkillsMap() {
   const navigate = useNavigate();
@@ -146,9 +147,10 @@ export default function SkillsMap() {
                   <span className="px-2 py-1 text-[11px] font-medium bg-gray-50 text-gray-700 border border-gray-200 rounded">
                     Robotics
                   </span>
-                  <span className="px-2 py-1 text-[11px] font-medium bg-cyan-50 text-cyan-700 border border-cyan-200 rounded">
-                    Human-Robot Interaction
-                  </span>
+                  <MatchedTag
+                    label="Human-Robot Interaction"
+                    reason="Matches your listed interest in Human-Robot Interaction"
+                  />
                   <span className="px-2 py-1 text-[11px] font-medium bg-gray-50 text-gray-700 border border-gray-200 rounded">
                     Surgery Assistance
                   </span>
@@ -162,9 +164,10 @@ export default function SkillsMap() {
                   <span className="px-2 py-1 text-[11px] font-medium bg-gray-50 text-gray-700 border border-gray-200 rounded">
                     Robotics Engineers
                   </span>
-                  <span className="px-2 py-1 text-[11px] font-medium bg-cyan-50 text-cyan-700 border border-cyan-200 rounded">
-                    Human-Robot Interaction Practitioner
-                  </span>
+                  <MatchedTag
+                    label="Human-Robot Interaction Practitioner"
+                    reason="Your HCI background directly fits this open role"
+                  />
                   <span className="px-2 py-1 text-[11px] font-medium bg-gray-50 text-gray-700 border border-gray-200 rounded">
                     Grant Writers
                   </span>

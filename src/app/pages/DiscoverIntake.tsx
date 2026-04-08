@@ -207,21 +207,21 @@ export default function DiscoverIntake({ onComplete }: DiscoverIntakeProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
       <div className="w-full max-w-3xl">
         {/* Progress Bar */}
-        <div className="mb-12">
-          <div className="flex justify-between items-center mb-3">
-            <span className="text-sm text-gray-600">
+        <div className="mb-10">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-[13px] text-gray-500">
               Step {currentStep + 1} of {steps.length}
             </span>
-            <span className="text-sm text-gray-600">
+            <span className="text-[13px] text-gray-500">
               {Math.round(((currentStep + 1) / steps.length) * 100)}% complete
             </span>
           </div>
-          <div className="h-1.5 bg-white/60 rounded-full overflow-hidden">
+          <div className="h-1 bg-gray-200 rounded-full overflow-hidden">
             <motion.div
-              className="h-full bg-gradient-to-r from-orange-400 to-rose-400"
+              className="h-full bg-gray-900"
               initial={{ width: 0 }}
               animate={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
               transition={{ duration: 0.5, ease: 'easeOut' }}
@@ -232,38 +232,38 @@ export default function DiscoverIntake({ onComplete }: DiscoverIntakeProps) {
         <AnimatePresence mode="wait">
           <motion.div
             key={currentStep}
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.4 }}
-            className="bg-white rounded-2xl shadow-xl p-12"
+            exit={{ opacity: 0, y: -16 }}
+            transition={{ duration: 0.3 }}
+            className="bg-white rounded-xl border border-gray-200 shadow-sm p-10"
           >
             {/* Question Header */}
-            <div className="mb-12 text-center">
-              <h1 className="text-5xl font-semibold text-gray-900 mb-4 leading-tight">
+            <div className="mb-8">
+              <h1 className="text-2xl font-semibold text-gray-900 mb-1.5 leading-snug">
                 {currentStepData.question}
               </h1>
-              <p className="text-xl text-gray-600">
+              <p className="text-[14px] text-gray-500">
                 {currentStepData.subtitle}
               </p>
             </div>
 
             {/* Answer Options */}
-            <div className="mb-12">
+            <div className="mb-8">
               {currentStepData.type === 'role-select' && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   {(['doctor', 'designer', 'engineer'] as const).map((role) => (
                     <button
                       key={role}
                       onClick={() => handleRoleSelect(role)}
-                      className={`p-8 rounded-xl border-2 transition-all duration-200 ${
+                      className={`p-6 rounded-lg border transition-all duration-150 text-left ${
                         data.role === role
-                          ? 'border-orange-400 bg-orange-50 shadow-lg scale-105'
-                          : 'border-gray-200 hover:border-orange-200 hover:bg-orange-50/30'
+                          ? 'border-gray-900 bg-gray-50 shadow-sm'
+                          : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                       }`}
                     >
-                      <div className="text-5xl mb-4">{getRoleIcon(role)}</div>
-                      <div className="text-lg font-semibold text-gray-900">
+                      <div className="text-3xl mb-3">{getRoleIcon(role)}</div>
+                      <div className="text-[14px] font-semibold text-gray-900">
                         {getRoleTitle(role)}
                       </div>
                     </button>
@@ -272,28 +272,28 @@ export default function DiscoverIntake({ onComplete }: DiscoverIntakeProps) {
               )}
 
               {currentStepData.type === 'multi-select' && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                   {currentStepData.options?.map((option) => {
-                    const field = currentStepData.id === 'intent' ? 'collaborationIntent' 
+                    const field = currentStepData.id === 'intent' ? 'collaborationIntent'
                       : currentStepData.id === 'topic' ? 'topicArea'
                       : currentStepData.id === 'skills' ? 'skills'
                       : 'projectStage';
                     const isSelected = (data[field] as string[]).includes(option);
-                    
+
                     return (
                       <button
                         key={option}
                         onClick={() => handleMultiSelect(field as keyof IntakeData, option)}
-                        className={`p-5 rounded-lg border-2 transition-all duration-200 text-left ${
+                        className={`px-4 py-3 rounded-lg border transition-all duration-150 text-left ${
                           isSelected
-                            ? 'border-orange-400 bg-orange-50'
-                            : 'border-gray-200 hover:border-orange-200 hover:bg-orange-50/30'
+                            ? 'border-gray-900 bg-gray-50'
+                            : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                         }`}
                       >
                         <div className="flex items-center justify-between">
-                          <span className="text-base font-medium text-gray-900">{option}</span>
+                          <span className="text-[13px] font-medium text-gray-900">{option}</span>
                           {isSelected && (
-                            <Check className="h-5 w-5 text-orange-500" />
+                            <Check className="h-4 w-4 text-gray-900 shrink-0" />
                           )}
                         </div>
                       </button>
@@ -303,24 +303,24 @@ export default function DiscoverIntake({ onComplete }: DiscoverIntakeProps) {
               )}
 
               {currentStepData.type === 'single-select' && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                   {currentStepData.options?.map((option) => {
                     const isSelected = data.availability === option;
-                    
+
                     return (
                       <button
                         key={option}
                         onClick={() => handleSingleSelect('availability', option)}
-                        className={`p-5 rounded-lg border-2 transition-all duration-200 text-left ${
+                        className={`px-4 py-3 rounded-lg border transition-all duration-150 text-left ${
                           isSelected
-                            ? 'border-orange-400 bg-orange-50'
-                            : 'border-gray-200 hover:border-orange-200 hover:bg-orange-50/30'
+                            ? 'border-gray-900 bg-gray-50'
+                            : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                         }`}
                       >
                         <div className="flex items-center justify-between">
-                          <span className="text-base font-medium text-gray-900">{option}</span>
+                          <span className="text-[13px] font-medium text-gray-900">{option}</span>
                           {isSelected && (
-                            <Check className="h-5 w-5 text-orange-500" />
+                            <Check className="h-4 w-4 text-gray-900 shrink-0" />
                           )}
                         </div>
                       </button>
@@ -330,14 +330,14 @@ export default function DiscoverIntake({ onComplete }: DiscoverIntakeProps) {
               )}
 
               {currentStepData.type === 'location' && (
-                <div className="max-w-md mx-auto">
+                <div className="max-w-md">
                   <div className="relative">
-                    <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                    <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <input
                       type="text"
                       value={data.location}
                       onChange={(e) => setData({ ...data, location: e.target.value })}
-                      className="w-full pl-12 pr-4 py-4 text-lg border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
+                      className="w-full pl-10 pr-4 py-3 text-[13px] border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-gray-300"
                       placeholder="Enter your location"
                     />
                   </div>
@@ -345,66 +345,68 @@ export default function DiscoverIntake({ onComplete }: DiscoverIntakeProps) {
               )}
 
               {currentStepData.type === 'preview' && (
-                <div className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="p-6 bg-gradient-to-br from-orange-50 to-rose-50 rounded-xl">
-                      <div className="flex items-center gap-3 mb-3">
-                        <div className="p-2 bg-white rounded-lg">
-                          <span className="text-2xl">{data.role && getRoleIcon(data.role)}</span>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="p-1.5 bg-white border border-gray-200 rounded-md">
+                          <span className="text-xl">{data.role && getRoleIcon(data.role)}</span>
                         </div>
                         <div>
-                          <div className="text-sm text-gray-600">Your role</div>
-                          <div className="font-semibold text-gray-900">
+                          <div className="text-[12px] text-gray-500">Your role</div>
+                          <div className="text-[13px] font-semibold text-gray-900">
                             {data.role && getRoleTitle(data.role)}
                           </div>
                         </div>
                       </div>
                     </div>
 
-                    <div className="p-6 bg-gradient-to-br from-orange-50 to-rose-50 rounded-xl">
-                      <div className="flex items-center gap-3 mb-3">
-                        <div className="p-2 bg-white rounded-lg">
-                          <MapPin className="h-6 w-6 text-orange-500" />
+                    <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="p-1.5 bg-white border border-gray-200 rounded-md">
+                          <MapPin className="h-5 w-5 text-gray-600" />
                         </div>
                         <div>
-                          <div className="text-sm text-gray-600">Location</div>
-                          <div className="font-semibold text-gray-900">{data.location}</div>
+                          <div className="text-[12px] text-gray-500">Location</div>
+                          <div className="text-[13px] font-semibold text-gray-900">{data.location}</div>
                         </div>
                       </div>
                     </div>
 
-                    <div className="p-6 bg-gradient-to-br from-orange-50 to-rose-50 rounded-xl">
-                      <div className="flex items-center gap-3 mb-3">
-                        <div className="p-2 bg-white rounded-lg">
-                          <Calendar className="h-6 w-6 text-orange-500" />
+                    <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="p-1.5 bg-white border border-gray-200 rounded-md">
+                          <Calendar className="h-5 w-5 text-gray-600" />
                         </div>
                         <div>
-                          <div className="text-sm text-gray-600">Availability</div>
-                          <div className="font-semibold text-gray-900">{data.availability}</div>
+                          <div className="text-[12px] text-gray-500">Availability</div>
+                          <div className="text-[13px] font-semibold text-gray-900">{data.availability}</div>
                         </div>
                       </div>
                     </div>
 
-                    <div className="p-6 bg-gradient-to-br from-orange-50 to-rose-50 rounded-xl">
-                      <div className="flex items-center gap-3 mb-3">
-                        <div className="p-2 bg-white rounded-lg">
-                          <Lightbulb className="h-6 w-6 text-orange-500" />
+                    <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="p-1.5 bg-white border border-gray-200 rounded-md">
+                          <Lightbulb className="h-5 w-5 text-gray-600" />
                         </div>
                         <div>
-                          <div className="text-sm text-gray-600">Topics</div>
-                          <div className="font-semibold text-gray-900">
-                            {data.topicArea.length} areas
+                          <div className="text-[12px] text-gray-500">Topics</div>
+                          <div className="text-[13px] font-semibold text-gray-900">
+                            {data.topicArea.length} areas selected
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  <div className="p-6 bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl">
-                    <p className="text-lg text-gray-700 text-center">
-                      We found <span className="font-bold text-orange-600">
+                  <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                    <p className="text-[13px] text-gray-700 text-center">
+                      We found{' '}
+                      <span className="font-semibold text-gray-900">
                         {data.topicArea.length * 2 + 3} potential collaborators
-                      </span> who match your interests in the Cleveland area
+                      </span>{' '}
+                      who match your interests in the Cleveland area
                     </p>
                   </div>
                 </div>
@@ -412,31 +414,31 @@ export default function DiscoverIntake({ onComplete }: DiscoverIntakeProps) {
             </div>
 
             {/* Navigation */}
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between pt-2 border-t border-gray-100">
               <button
                 onClick={handleBack}
                 disabled={currentStep === 0}
-                className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all ${
+                className={`flex items-center gap-1.5 px-4 py-2 rounded-md text-[13px] font-medium transition-colors ${
                   currentStep === 0
-                    ? 'text-gray-400 cursor-not-allowed'
-                    : 'text-gray-700 hover:bg-gray-100'
+                    ? 'text-gray-300 cursor-not-allowed'
+                    : 'text-gray-600 hover:bg-gray-100'
                 }`}
               >
-                <ArrowLeft className="h-5 w-5" />
+                <ArrowLeft className="h-4 w-4" />
                 Back
               </button>
 
               <button
                 onClick={handleNext}
                 disabled={!isStepComplete()}
-                className={`flex items-center gap-2 px-8 py-4 rounded-lg font-semibold text-lg transition-all ${
+                className={`flex items-center gap-1.5 px-5 py-2 rounded-md text-[13px] font-semibold transition-colors ${
                   isStepComplete()
-                    ? 'bg-gradient-to-r from-orange-500 to-rose-500 text-white hover:shadow-lg hover:scale-105'
-                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                    ? 'bg-gray-900 text-white hover:bg-gray-800'
+                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                 }`}
               >
                 {currentStep === steps.length - 1 ? 'Explore Map' : 'Continue'}
-                <ArrowRight className="h-5 w-5" />
+                <ArrowRight className="h-4 w-4" />
               </button>
             </div>
           </motion.div>
