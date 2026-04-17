@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { Link } from "react-router";
 import { Header } from "../components/Header";
-import { Search, ChevronDown, MapPin, Bookmark, TrendingUp, X } from "lucide-react";
+import { Search, ChevronDown, MapPin, TrendingUp, X } from "lucide-react";
 import imgRobot from "../../assets/0dd2934842d6fa9897708ea0e164b300c59f584e.png";
 import { MatchExplanation } from "../components/MatchExplanation";
 import { useBookmarks } from "../context/BookmarksContext";
 import { ContactModal } from "../components/ContactModal";
+import DiscoverIntake from "./DiscoverIntake";
+import DiscoverMap from "./DiscoverMap";
 
 interface Project {
   id: string;
@@ -22,6 +24,9 @@ interface Project {
 }
 
 export default function FindProjects() {
+  const [activeTab, setActiveTab] = useState<"browse" | "discover">("browse");
+  const [discoverStage, setDiscoverStage] = useState<"intake" | "map">("intake");
+  const [discoverData, setDiscoverData] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDomain, setSelectedDomain] = useState("");
   const [selectedSkill, setSelectedSkill] = useState("");
@@ -32,19 +37,6 @@ export default function FindProjects() {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const { isBookmarked, toggleBookmark } = useBookmarks();
   const [contactProject, setContactProject] = useState<Project | null>(null);
-  const [followedIds, setFollowedIds] = useState<string[]>(() =>
-    JSON.parse(localStorage.getItem("followedProjects") || "[]")
-  );
-
-  const handleStayUpdated = (project: Project) => {
-    setFollowedIds(prev => {
-      const updated = prev.includes(project.id)
-        ? prev.filter(id => id !== project.id)
-        : [...prev, project.id];
-      localStorage.setItem("followedProjects", JSON.stringify(updated));
-      return updated;
-    });
-  };
 
   const projects: Project[] = [
     {
@@ -172,13 +164,49 @@ export default function FindProjects() {
       
       <main className="flex-1">
         <div className="max-w-7xl mx-auto px-6 py-8">
-          {/* Page Header */}
+          {/* Page Header + Tabs */}
           <div className="mb-6">
-            <h1 className="text-2xl font-semibold text-gray-900 mb-1">Find Projects</h1>
-            <p className="text-[13px] text-gray-600">
-              Discover research opportunities in Cleveland, Ohio
-            </p>
+            <div className="flex items-end justify-between mb-4">
+              <div>
+                <h1 className="text-2xl font-semibold text-gray-900 mb-1">Find Projects</h1>
+                <p className="text-[13px] text-gray-600">
+                  Discover research opportunities in Cleveland, Ohio
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-1 border-b border-gray-200">
+              <button
+                onClick={() => setActiveTab("browse")}
+                className={`px-4 py-2 text-[13px] font-medium border-b-2 transition-colors -mb-px ${
+                  activeTab === "browse"
+                    ? "border-gray-900 text-gray-900"
+                    : "border-transparent text-gray-500 hover:text-gray-700"
+                }`}
+              >
+                Browse
+              </button>
+              <button
+                onClick={() => setActiveTab("discover")}
+                className={`px-4 py-2 text-[13px] font-medium border-b-2 transition-colors -mb-px ${
+                  activeTab === "discover"
+                    ? "border-gray-900 text-gray-900"
+                    : "border-transparent text-gray-500 hover:text-gray-700"
+                }`}
+              >
+                Discover
+              </button>
+            </div>
           </div>
+
+          {/* Discover tab */}
+          {activeTab === "discover" && (
+            discoverStage === "intake"
+              ? <DiscoverIntake onComplete={(data) => { setDiscoverData(data); setDiscoverStage("map"); }} />
+              : <DiscoverMap intakeData={discoverData} onEditFilters={() => setDiscoverStage("intake")} />
+          )}
+
+          {/* Browse tab content */}
+          {activeTab === "browse" && <>
 
           {/* Advanced Search Filters */}
           <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6">
@@ -339,20 +367,6 @@ export default function FindProjects() {
                         </div>
                         <p className="text-[13px] text-gray-600">{project.lab}</p>
                       </div>
-                      <button
-                        onClick={() => toggleBookmark({
-                          id: project.id,
-                          name: project.name,
-                          lab: project.lab,
-                          location: project.location,
-                          tags: project.tags,
-                          matchPercentage: project.matchPercentage,
-                        })}
-                        title={isBookmarked(project.id) ? "Remove bookmark" : "Save to profile"}
-                        className="p-2 hover:bg-gray-100 rounded-md transition-colors"
-                      >
-                        <Bookmark className={`h-4 w-4 transition-colors ${isBookmarked(project.id) ? "fill-gray-900 text-gray-900" : "text-gray-400"}`} />
-                      </button>
                     </div>
 
                     {/* Location */}
@@ -373,7 +387,7 @@ export default function FindProjects() {
                           key={idx}
                           className={`px-2.5 py-1 text-[11px] font-medium rounded-md ${
                             hasActiveSearch && tag === project.highlightTag
-                              ? 'bg-cyan-50 text-cyan-700 border border-cyan-200'
+                              ? 'bg-green-50 text-green-700 border border-green-200'
                               : 'bg-gray-50 text-gray-700 border border-gray-200'
                           }`}
                         >
@@ -391,14 +405,21 @@ export default function FindProjects() {
                         View Project
                       </Link>
                       <button
-                        onClick={() => handleStayUpdated(project)}
+                        onClick={() => toggleBookmark({
+                          id: project.id,
+                          name: project.name,
+                          lab: project.lab,
+                          location: project.location,
+                          tags: project.tags,
+                          matchPercentage: project.matchPercentage,
+                        })}
                         className={`px-4 py-2 text-[13px] font-medium rounded-md border transition-colors ${
-                          followedIds.includes(project.id)
+                          isBookmarked(project.id)
                             ? "text-green-700 bg-green-50 border-green-300"
                             : "text-gray-700 bg-white border-gray-300 hover:bg-gray-50"
                         }`}
                       >
-                        {followedIds.includes(project.id) ? "Following" : "Stay Updated"}
+                        {isBookmarked(project.id) ? "Following" : "Stay Updated"}
                       </button>
                       <button
                         onClick={() => setContactProject(project)}
@@ -412,6 +433,8 @@ export default function FindProjects() {
               </div>
             ))}
           </div>
+
+          </>}
         </div>
       </main>
 

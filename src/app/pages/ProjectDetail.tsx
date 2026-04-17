@@ -1,6 +1,6 @@
 import { Header } from "../components/Header";
 import { Link, useParams } from "react-router";
-import { MapPin, ExternalLink, TrendingUp, Bookmark } from "lucide-react";
+import { MapPin, ExternalLink, TrendingUp } from "lucide-react";
 import imgRobot1 from "../../assets/ddae6b8d5d02b2088350f4841c6924acbca5d8f7.png";
 import imgRobot2 from "../../assets/83df25dac5dc5e2ced674c21a91028ff1d2960ae.png";
 import imgRoboDog3 from "../../assets/c1723e711714dd180e9890511514930b6856cfb4.png";
@@ -236,6 +236,7 @@ export default function ProjectDetail() {
   const [showMatchExplanation, setShowMatchExplanation] = useState(false);
   const [expandedUpdate, setExpandedUpdate] = useState<number | null>(null);
   const { isBookmarked, toggleBookmark } = useBookmarks();
+  const project = projectsData[id ?? ""] ?? projectsData["robodog"];
 
   const projectUpdates = [
     {
@@ -284,27 +285,8 @@ export default function ProjectDetail() {
     },
   ];
 
-  const project = projectsData[id ?? ""] ?? projectsData["robodog"];
-
-  const isFollowed = (): boolean => {
-    const followed: string[] = JSON.parse(localStorage.getItem("followedProjects") || "[]");
-    return followed.includes(project.id);
-  };
-
-  const [following, setFollowing] = useState(isFollowed);
-
-  const handleStayUpdated = () => {
-    const followed: string[] = JSON.parse(localStorage.getItem("followedProjects") || "[]");
-    const updated = followed.includes(project.id)
-      ? followed.filter(id => id !== project.id)
-      : [...followed, project.id];
-    localStorage.setItem("followedProjects", JSON.stringify(updated));
-    setFollowing(!followed.includes(project.id));
-  };
-
   useEffect(() => {
     window.scrollTo(0, 0);
-    setFollowing(isFollowed());
   }, [id]);
 
   const myAvailability = [
@@ -382,24 +364,13 @@ export default function ProjectDetail() {
                         tags: project.researchAreas,
                         matchPercentage: project.matchPercentage,
                       })}
-                      className={`px-4 py-2 text-[13px] font-medium rounded-md border transition-colors flex items-center gap-2 ${
-                        isBookmarked(project.id)
-                          ? "bg-gray-900 text-white border-gray-900 hover:bg-gray-800"
-                          : "text-gray-700 bg-white border-gray-300 hover:bg-gray-50"
-                      }`}
-                    >
-                      <Bookmark className={`h-3.5 w-3.5 ${isBookmarked(project.id) ? "fill-white" : ""}`} />
-                      {isBookmarked(project.id) ? "Saved" : "Save Project"}
-                    </button>
-                    <button
-                      onClick={handleStayUpdated}
                       className={`px-4 py-2 text-[13px] font-medium rounded-md border transition-colors ${
-                        following
+                        isBookmarked(project.id)
                           ? "text-green-700 bg-green-50 border-green-300"
                           : "text-gray-700 bg-white border-gray-300 hover:bg-gray-50"
                       }`}
                     >
-                      {following ? "Following" : "Stay Updated"}
+                      {isBookmarked(project.id) ? "Following" : "Stay Updated"}
                     </button>
                     <button className="px-4 py-2 text-[13px] font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors whitespace-nowrap">
                       Contact Project Coordinator

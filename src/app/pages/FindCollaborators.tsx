@@ -4,8 +4,13 @@ import { Search, SlidersHorizontal, UserCircle2, TrendingUp } from "lucide-react
 import { MatchExplanation } from "../components/MatchExplanation";
 import { ContactModal } from "../components/ContactModal";
 import { Link } from "react-router";
+import DiscoverIntake from "./DiscoverIntake";
+import DiscoverMap from "./DiscoverMap";
 
 export default function FindCollaborators() {
+  const [activeTab, setActiveTab] = useState<"browse" | "discover">("browse");
+  const [discoverStage, setDiscoverStage] = useState<"intake" | "map">("intake");
+  const [discoverData, setDiscoverData] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [showMatchExplanation, setShowMatchExplanation] = useState(false);
   const [selectedCollab, setSelectedCollab] = useState<any>(null);
@@ -123,11 +128,45 @@ export default function FindCollaborators() {
       
       <main className="flex-1">
         <div className="max-w-7xl mx-auto px-6 py-8">
-          {/* Page Header */}
+          {/* Page Header + Tabs */}
           <div className="mb-6">
-            <h1 className="text-2xl font-semibold text-gray-900 mb-1">Find Collaborators</h1>
-            <p className="text-[13px] text-gray-600">Search for researchers and clinicians to join your projects</p>
+            <div className="mb-4">
+              <h1 className="text-2xl font-semibold text-gray-900 mb-1">Find Collaborators</h1>
+              <p className="text-[13px] text-gray-600">Search for researchers and clinicians to join your projects</p>
+            </div>
+            <div className="flex gap-1 border-b border-gray-200">
+              <button
+                onClick={() => setActiveTab("browse")}
+                className={`px-4 py-2 text-[13px] font-medium border-b-2 transition-colors -mb-px ${
+                  activeTab === "browse"
+                    ? "border-gray-900 text-gray-900"
+                    : "border-transparent text-gray-500 hover:text-gray-700"
+                }`}
+              >
+                Browse
+              </button>
+              <button
+                onClick={() => setActiveTab("discover")}
+                className={`px-4 py-2 text-[13px] font-medium border-b-2 transition-colors -mb-px ${
+                  activeTab === "discover"
+                    ? "border-gray-900 text-gray-900"
+                    : "border-transparent text-gray-500 hover:text-gray-700"
+                }`}
+              >
+                Discover
+              </button>
+            </div>
           </div>
+
+          {/* Discover tab */}
+          {activeTab === "discover" && (
+            discoverStage === "intake"
+              ? <DiscoverIntake onComplete={(data) => { setDiscoverData(data); setDiscoverStage("map"); }} />
+              : <DiscoverMap intakeData={discoverData} onEditFilters={() => setDiscoverStage("intake")} />
+          )}
+
+          {/* Browse tab content */}
+          {activeTab === "browse" && <>
 
           {/* Search Bar */}
           <div className="mb-6 flex gap-2">
@@ -208,7 +247,7 @@ export default function FindCollaborators() {
                             key={skillIdx}
                             className={`px-2 py-1 text-[11px] border rounded-md ${
                               hasActiveSearch && collab.highlightSkills.includes(skill)
-                                ? 'bg-cyan-50 text-cyan-700 border-cyan-200'
+                                ? 'bg-green-50 text-green-700 border-green-200'
                                 : 'bg-gray-50 text-gray-700 border-gray-200'
                             }`}
                           >
@@ -227,7 +266,7 @@ export default function FindCollaborators() {
                             key={interestIdx}
                             className={`px-2 py-1 text-[11px] border rounded-md ${
                               hasActiveSearch && collab.highlightInterests.includes(interest)
-                                ? 'bg-cyan-50 text-cyan-700 border-cyan-200'
+                                ? 'bg-green-50 text-green-700 border-green-200'
                                 : 'bg-gray-50 text-gray-600 border-gray-200'
                             }`}
                           >
@@ -274,6 +313,8 @@ export default function FindCollaborators() {
               </div>
             ))}
           </div>
+
+          </>}
         </div>
       </main>
 

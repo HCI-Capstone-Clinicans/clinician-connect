@@ -1,13 +1,26 @@
 import { Header } from "../components/Header";
-import { UserCircle2, Pencil, FileText, Mail, MapPin, Clock, Bookmark, X } from "lucide-react";
+import { UserCircle2, Pencil, Mail, MapPin, Clock, X } from "lucide-react";
 import { Link } from "react-router";
+import { useState } from "react";
 import { useBookmarks } from "../context/BookmarksContext";
 import imgProfile from "../../assets/1a8e8f1388acd7e29af0518ac07ccba9821174d6.png";
 import imgProject from "../../assets/58fc0ac8e1ce3bfeee1106e5418571c76bcc020d.png";
 import imgResume from "../../assets/eea162a3bdec95f2e78582620862a4027b240df8.png";
 
+const myProjects = [
+  {
+    id: "robodog",
+    name: "RoboDog",
+    lab: "Carroll Labs",
+    location: "UH Cleveland Medical Center",
+    role: "HCI Researcher",
+    tags: ["Robotics", "Human-Robot Interaction", "Surgery Assistance"],
+  },
+];
+
 export default function MyProfile() {
-  const { bookmarks, toggleBookmark } = useBookmarks();
+  const [showResume, setShowResume] = useState(false);
+  const { bookmarks } = useBookmarks();
   const skills = [
     "Product Design",
     "User Research",
@@ -67,19 +80,19 @@ export default function MyProfile() {
           <div className="mb-8">
             <div className="flex items-start justify-between mb-4">
               <h1 className="text-2xl font-semibold text-gray-900">My Profile</h1>
-              <button className="px-4 py-2 text-[13px] font-medium text-gray-700 border border-gray-300 hover:bg-gray-50 transition-colors flex items-center gap-2">
+              <button className="px-4 py-2 text-[13px] font-medium text-gray-700 border border-gray-300 hover:bg-gray-50 transition-colors flex items-center gap-2 rounded-md">
                 <Pencil className="h-3.5 w-3.5" />
                 Edit Profile
               </button>
             </div>
             <div className="flex gap-2">
-              <button className="px-3 py-1.5 text-[12px] font-medium text-gray-700 border border-gray-300 hover:bg-gray-50 transition-colors">
+              <button className="px-3 py-1.5 text-[12px] font-medium text-gray-700 border border-gray-300 hover:bg-gray-50 transition-colors rounded-md">
                 Import from LinkedIn
               </button>
-              <button className="px-3 py-1.5 text-[12px] font-medium text-gray-700 border border-gray-300 hover:bg-gray-50 transition-colors">
+              <button className="px-3 py-1.5 text-[12px] font-medium text-gray-700 border border-gray-300 hover:bg-gray-50 transition-colors rounded-md">
                 Import from ORCID
               </button>
-              <button className="px-3 py-1.5 text-[12px] font-medium text-gray-700 border border-gray-300 hover:bg-gray-50 transition-colors">
+              <button className="px-3 py-1.5 text-[12px] font-medium text-gray-700 border border-gray-300 hover:bg-gray-50 transition-colors rounded-md">
                 Download Resume
               </button>
             </div>
@@ -153,9 +166,39 @@ export default function MyProfile() {
                     {skills.map((skill, idx) => (
                       <span
                         key={idx}
-                        className="px-2 py-1 bg-gray-50 text-gray-700 text-[11px] border border-gray-200"
+                        className="px-2 py-1 bg-gray-50 text-gray-700 text-[11px] border border-gray-200 rounded-md"
                       >
                         {skill}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Research Interests */}
+                <div className="pt-4 border-t border-gray-200">
+                  <p className="text-[11px] font-medium text-gray-500 mb-3 uppercase tracking-wide">Research Interests</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {["Human-Robot Interaction", "Clinical UX", "Healthcare Technology", "Participatory Design", "Accessibility"].map((interest) => (
+                      <span
+                        key={interest}
+                        className="px-2 py-1 bg-gray-50 text-gray-700 text-[11px] border border-gray-200 rounded-md"
+                      >
+                        {interest}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Collaboration Style */}
+                <div className="pt-4 border-t border-gray-200">
+                  <p className="text-[11px] font-medium text-gray-500 mb-3 uppercase tracking-wide">Collaboration Style</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {["Remote-Friendly", "Async-First", "Cross-Disciplinary", "Workshop Facilitator"].map((style) => (
+                      <span
+                        key={style}
+                        className="px-2 py-1 bg-gray-50 text-gray-700 text-[11px] border border-gray-200 rounded-md"
+                      >
+                        {style}
                       </span>
                     ))}
                   </div>
@@ -180,6 +223,17 @@ export default function MyProfile() {
                   </div>
                 </div>
               </div>
+
+              {/* Resume */}
+              <div className="bg-white border border-gray-200 rounded-lg p-5 space-y-3">
+                <p className="text-[11px] font-medium text-gray-500 uppercase tracking-wide">Resume</p>
+                <button
+                  onClick={() => setShowResume(true)}
+                  className="w-full px-4 py-2 text-[13px] font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-md transition-colors"
+                >
+                  View Resume
+                </button>
+              </div>
             </div>
 
             {/* Right Column - Content */}
@@ -192,73 +246,6 @@ export default function MyProfile() {
                   Currently working on the RoboDog project at University Hospitals Cleveland, where I bridge the gap between 
                   technology and clinical practice through user-centered design.
                 </p>
-              </div>
-
-              {/* Saved Projects */}
-              <div className="bg-white border border-gray-200 rounded-lg p-6 space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <h2 className="text-[11px] font-medium text-gray-500 uppercase tracking-wide">Saved Projects</h2>
-                    {bookmarks.length > 0 && (
-                      <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-gray-100 text-gray-600 rounded">
-                        {bookmarks.length}
-                      </span>
-                    )}
-                  </div>
-                  <Bookmark className="h-4 w-4 text-gray-400" />
-                </div>
-
-                {bookmarks.length === 0 ? (
-                  <div className="py-6 flex flex-col items-center text-center gap-2">
-                    <Bookmark className="h-8 w-8 text-gray-200" />
-                    <p className="text-[13px] text-gray-500">No saved projects yet</p>
-                    <p className="text-[12px] text-gray-400">Bookmark projects from the Find Projects page to save them here.</p>
-                    <Link
-                      to="/find-projects"
-                      className="mt-2 px-4 py-2 text-[12px] font-medium text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
-                    >
-                      Browse Projects
-                    </Link>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {bookmarks.map((project) => (
-                      <div
-                        key={project.id}
-                        className="flex items-start justify-between gap-3 p-3 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors"
-                      >
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <Link
-                              to={`/project/${project.id}`}
-                              className="text-[13px] font-semibold text-gray-900 hover:text-gray-700 transition-colors"
-                            >
-                              {project.name}
-                            </Link>
-                            <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-green-50 text-green-700 border border-green-200 rounded">
-                              {project.matchPercentage}% Match
-                            </span>
-                          </div>
-                          <p className="text-[11px] text-gray-500 mb-2">{project.lab} · {project.location}</p>
-                          <div className="flex flex-wrap gap-1">
-                            {project.tags.slice(0, 3).map((tag, idx) => (
-                              <span key={idx} className="px-1.5 py-0.5 text-[10px] bg-gray-50 text-gray-600 border border-gray-200 rounded">
-                                {tag}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => toggleBookmark(project)}
-                          title="Remove bookmark"
-                          className="p-1.5 hover:bg-gray-100 rounded transition-colors flex-shrink-0 mt-0.5"
-                        >
-                          <X className="h-3.5 w-3.5 text-gray-400" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
               </div>
 
               {/* AI Insights */}
@@ -292,25 +279,117 @@ export default function MyProfile() {
                 </div>
               </div>
 
-              {/* Portfolio/Projects Preview */}
-              <div className="bg-white border border-gray-200 rounded-lg p-6 space-y-4">
+              {/* Projects Overview */}
+              <div className="bg-white border border-gray-200 rounded-lg p-6 space-y-5">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-[11px] font-medium text-gray-500 uppercase tracking-wide">Recent Work</h2>
-                  <button className="text-[12px] text-gray-600 hover:text-gray-900">View All →</button>
+                  <h2 className="text-[11px] font-medium text-gray-500 uppercase tracking-wide">Projects</h2>
+                  <Link to="/my-projects" className="text-[12px] text-gray-600 hover:text-gray-900 transition-colors">
+                    View All →
+                  </Link>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="aspect-video bg-gray-100 border border-gray-200 rounded-md flex items-center justify-center">
-                    <span className="text-[11px] text-gray-400">Project Image</span>
-                  </div>
-                  <div className="aspect-video bg-gray-100 border border-gray-200 rounded-md flex items-center justify-center">
-                    <span className="text-[11px] text-gray-400">Project Image</span>
+
+                {/* My Projects */}
+                <div>
+                  <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-2">Member</p>
+                  <div className="space-y-2">
+                    {myProjects.map((project) => (
+                      <Link
+                        key={project.id}
+                        to={`/project/${project.id}`}
+                        className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors group"
+                      >
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-0.5">
+                            <span className="text-[13px] font-semibold text-gray-900 group-hover:text-gray-700 transition-colors truncate">
+                              {project.name}
+                            </span>
+                            <span className="px-1.5 py-0.5 text-[10px] font-medium bg-green-50 text-green-700 border border-green-200 rounded uppercase tracking-wide flex-shrink-0">
+                              Active
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-gray-500">{project.lab} · {project.role}</p>
+                        </div>
+                        <div className="flex items-center gap-1.5 ml-3 flex-shrink-0">
+                          <MapPin className="h-3 w-3 text-gray-400" />
+                          <span className="text-[11px] text-gray-500 hidden sm:block">{project.location}</span>
+                        </div>
+                      </Link>
+                    ))}
                   </div>
                 </div>
+
+                {/* Following */}
+                {bookmarks.length > 0 && (
+                  <div>
+                    <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-2">Following</p>
+                    <div className="space-y-2">
+                      {bookmarks.map((project) => (
+                        <Link
+                          key={project.id}
+                          to={`/project/${project.id}`}
+                          className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors group"
+                        >
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-0.5">
+                              <span className="text-[13px] font-semibold text-gray-900 group-hover:text-gray-700 transition-colors truncate">
+                                {project.name}
+                              </span>
+                              <span className="px-1.5 py-0.5 text-[10px] font-medium bg-blue-50 text-blue-700 border border-blue-200 rounded uppercase tracking-wide flex-shrink-0">
+                                Following
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-gray-500">{project.lab} · {project.location}</p>
+                          </div>
+                          {project.matchPercentage && (
+                            <span className="text-[11px] text-gray-500 ml-3 flex-shrink-0">{project.matchPercentage}% match</span>
+                          )}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {bookmarks.length === 0 && (
+                  <div>
+                    <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-2">Following</p>
+                    <p className="text-[12px] text-gray-400 px-1">No followed projects yet. Use "Stay Updated" on any project to track it here.</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
         </div>
       </main>
+
+      {/* Resume Modal */}
+      {showResume && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+          onClick={() => setShowResume(false)}
+        >
+          <div
+            className="relative bg-white rounded-lg shadow-xl max-w-2xl w-full mx-6 max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
+              <p className="text-[13px] font-semibold text-gray-900">Andrew Chan — Resume</p>
+              <button
+                onClick={() => setShowResume(false)}
+                className="p-1.5 hover:bg-gray-100 rounded-md transition-colors"
+              >
+                <X className="h-4 w-4 text-gray-500" />
+              </button>
+            </div>
+            <div className="p-5">
+              <img
+                src={imgResume}
+                alt="Resume"
+                className="w-full rounded-md border border-gray-200"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
