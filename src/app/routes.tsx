@@ -6,6 +6,7 @@ import MyProfile from "./pages/MyProfile";
 import MyProjects from "./pages/MyProjects";
 import SkillsMap from "./pages/SkillsMap";
 import ProfileView from "./pages/ProfileView";
+import OrcidSearch from "./pages/OrcidSearch";
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -38,5 +39,9 @@ export const router = createBrowserRouter([
   {
     path: "/my-projects",
     element: <MyProjects />,
+  },
+  {
+    path: "/orcid-search",
+    element: <OrcidSearch />,
   },
 ]);
