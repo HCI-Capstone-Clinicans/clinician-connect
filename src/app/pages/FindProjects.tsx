@@ -167,9 +167,9 @@ export default function FindProjects() {
           <div className="mb-6">
             <div className="flex items-end justify-between mb-4">
               <div>
-                <h1 className="text-2xl font-semibold text-gray-900 mb-1">Find Projects</h1>
-                <p className="text-[13px] text-gray-600">
-                  Discover research opportunities in Cleveland, Ohio
+                <h1 className="text-2xl font-semibold text-gray-900 mb-1">Clinician Connect</h1>
+                <p className="text-[15px] text-gray-500 italic">
+                  A cross-disciplinary platform to find collaborators and healthcare projects
                 </p>
               </div>
             </div>
