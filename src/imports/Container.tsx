@@ -318,11 +318,10 @@ function Frame() {
 
 export default function Container() {
   return (
-    <div className="bg-[#f9fafb] relative rounded-[10px] size-full" data-name="Container">
-      <div className="content-stretch flex flex-col items-center justify-center overflow-clip pl-px pr-[16px] py-px relative rounded-[inherit] size-full">
+    <div className="bg-white relative rounded-[10px] size-full" data-name="Container">
+      <div className="content-stretch flex flex-col items-center justify-center overflow-visible pl-px pr-[16px] py-px relative rounded-[inherit] size-full">
         <Frame />
       </div>
-      <div aria-hidden="true" className="absolute border border-[#e5e7eb] border-solid inset-0 pointer-events-none rounded-[10px]" />
     </div>
   );
 }

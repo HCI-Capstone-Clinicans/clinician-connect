@@ -401,13 +401,12 @@ function Frame() {
 
 export function VennDiagram5People() {
   return (
-    <div className="bg-[#f9fafb] h-[700px] relative rounded-[10px] w-full" data-name="Container">
-      <div className="flex flex-col items-center overflow-clip rounded-[inherit] size-full">
-        <div className="content-stretch flex flex-col items-center pl-px pr-[16px] py-[60px] relative size-full">
+    <div className="bg-white relative rounded-[10px] size-full" data-name="Container">
+      <div className="flex flex-col items-center justify-center overflow-visible rounded-[inherit] size-full">
+        <div className="content-stretch flex flex-col items-center pl-px pr-[16px] py-0 relative size-full">
           <Frame />
         </div>
       </div>
-      <div aria-hidden="true" className="absolute border border-[#e5e7eb] border-solid inset-0 pointer-events-none rounded-[10px]" />
     </div>
   );
 }
