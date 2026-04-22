@@ -38,6 +38,10 @@ export const router = createBrowserRouter(
     path: "/profile/:id",
     element: <ProfileView />,
   },
+  {
+    path: "/collaborator/:id",
+    element: <ProfileView />,
+  },
   // Auth routes
   {
     path: "/login",

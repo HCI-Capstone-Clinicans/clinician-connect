@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { Map, Marker, Overlay } from 'pigeon-maps';
+import { Map as PigeonMap, Marker, Overlay } from 'pigeon-maps';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Filter,
@@ -93,6 +93,12 @@ interface DiscoverMapProps {
   mode?: 'projects' | 'collaborators';
 }
 
+const PUBLIC_COLLABORATOR_PROFILE_IDS = new Set([
+  'jane-smith',
+  'john-doe',
+  'eric-shanefield',
+]);
+
 export default function DiscoverMap({ intakeData, onEditFilters, mode }: DiscoverMapProps) {
   const showProjects = mode !== 'collaborators';
   const showCollaborators = mode !== 'projects';
@@ -132,9 +138,11 @@ export default function DiscoverMap({ intakeData, onEditFilters, mode }: Discove
   const [mapCenter, setMapCenter] = useState<[number, number]>([41.4993, -81.6944]);
   const [mapZoom, setMapZoom] = useState(12);
   const [hoveredMarker, setHoveredMarker] = useState<string | null>(null);
+  const [hoveredLabel, setHoveredLabel] = useState<string | null>(null);
   const [showEditCriteria, setShowEditCriteria] = useState(false);
   const [showAllResults, setShowAllResults] = useState(false);
-  const [hasAppliedFilter, setHasAppliedFilter] = useState(false);
+  const [hasAppliedFilter, setHasAppliedFilter] = useState(true);
+  const [privateProfileName, setPrivateProfileName] = useState<string | null>(null);
   const DEFAULT_INTAKE: IntakeData = {
     role: null,
     collaborationIntent: [],
@@ -323,6 +331,14 @@ export default function DiscoverMap({ intakeData, onEditFilters, mode }: Discove
       getDistanceMiles(userLocation[0], userLocation[1], p.location.lat, p.location.lng) <= radiusFilter
     ),
   [radiusFilter]);
+  const projectsByInstitution = useMemo(() => {
+    const grouped = new Map<string, ProjectPin[]>();
+    filteredProjects.forEach((project) => {
+      const existing = grouped.get(project.institution) ?? [];
+      grouped.set(project.institution, [...existing, project]);
+    });
+    return grouped;
+  }, [filteredProjects]);
 
   // For adjacent mode, only show high-quality matches (top performers)
   const displayedCollaborators = useMemo(() => {
@@ -377,22 +393,41 @@ export default function DiscoverMap({ intakeData, onEditFilters, mode }: Discove
     }
   };
 
+  const handleViewCollaboratorProfile = (collab: Collaborator) => {
+    if (PUBLIC_COLLABORATOR_PROFILE_IDS.has(collab.id)) {
+      navigate(`/collaborator/${collab.id}`);
+      return;
+    }
+    setPrivateProfileName(collab.name);
+  };
+
   const CustomMarker = ({ 
     color, 
     size = 20, 
     isSelected = false,
     isUH = false,
-    isInstitution = false
+    isInstitution = false,
+    hoverLabel,
+    onHoverStart,
+    onHoverEnd,
   }: { 
     color: string; 
     size?: number; 
     isSelected?: boolean;
     isUH?: boolean;
     isInstitution?: boolean;
+    hoverLabel?: string;
+    onHoverStart?: () => void;
+    onHoverEnd?: () => void;
   }) => {
     if (isInstitution) {
       return (
-        <div className="relative">
+        <div
+          className="relative"
+          title={hoverLabel}
+          onMouseEnter={onHoverStart}
+          onMouseLeave={onHoverEnd}
+        >
           {isUH && (
             <>
               <div 
@@ -427,6 +462,9 @@ export default function DiscoverMap({ intakeData, onEditFilters, mode }: Discove
         className={`rounded-full border-2 border-white shadow-lg cursor-pointer transition-transform hover:scale-125 ${
           isSelected ? 'ring-4 ring-gray-700' : ''
         }`}
+        title={hoverLabel}
+        onMouseEnter={onHoverStart}
+        onMouseLeave={onHoverEnd}
         style={{ 
           width: `${size}px`, 
           height: `${size}px`, 
@@ -743,14 +781,14 @@ export default function DiscoverMap({ intakeData, onEditFilters, mode }: Discove
         </button>
 
         {/* Interactive Map */}
-        <Map
+        <PigeonMap
           center={mapCenter}
           zoom={mapZoom}
           onBoundsChanged={({ center, zoom }) => {
             setMapCenter(center);
             setMapZoom(zoom);
           }}
-          height="100%"
+          height={mapContainerRef.current?.clientHeight ?? 700}
           defaultWidth={600}
           attribution={false}
           provider={customTileProvider}
@@ -763,15 +801,27 @@ export default function DiscoverMap({ intakeData, onEditFilters, mode }: Discove
               offset={[20, 20]}
               onClick={() => setClickedMarkerId(prev => prev === inst.id ? null : inst.id)}
             >
-              <div className="relative">
+              <div
+                className="relative"
+              >
                 <CustomMarker
                   color="#64748b"
                   size={40}
                   isInstitution={true}
                   isUH={inst.isUH}
+                  hoverLabel={inst.name}
+                  onHoverStart={() => setHoveredLabel(inst.name)}
+                  onHoverEnd={() => setHoveredLabel((prev) => (prev === inst.name ? null : prev))}
                 />
+                {hoveredLabel === inst.name && (
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-[1200] pointer-events-none">
+                    <div className="bg-gray-900 text-white text-[11px] px-2.5 py-1.5 rounded-lg shadow-xl whitespace-nowrap">
+                      {inst.name}
+                    </div>
+                  </div>
+                )}
                 {clickedMarkerId === inst.id && (
-                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 w-52 pointer-events-auto">
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-[1300] w-56 pointer-events-auto">
                     <div className={`rounded-xl shadow-xl p-3 ${inst.isUH ? 'bg-gradient-to-br from-cyan-600 to-blue-700' : 'bg-gray-900'}`}>
                       <button
                         onClick={(e) => { e.stopPropagation(); setClickedMarkerId(null); }}
@@ -786,6 +836,31 @@ export default function DiscoverMap({ intakeData, onEditFilters, mode }: Discove
                       <p className={`text-xs mb-1 ${inst.isUH ? 'text-cyan-100' : 'text-gray-300'}`}>
                         {inst.collaboratorCount} collaborators
                       </p>
+                      {(projectsByInstitution.get(inst.name)?.length ?? 0) > 0 && (
+                        <div className={`mt-2 pt-2 border-t ${inst.isUH ? 'border-cyan-400/50' : 'border-white/20'}`}>
+                          <p className={`text-[10px] uppercase tracking-wide font-semibold mb-1 ${inst.isUH ? 'text-cyan-100' : 'text-gray-300'}`}>
+                            Projects at institution
+                          </p>
+                          <div className="space-y-1">
+                            {(projectsByInstitution.get(inst.name) ?? []).slice(0, 3).map((project) => (
+                              <button
+                                key={project.id}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  navigate(`/project/${project.id}`);
+                                }}
+                                className={`w-full text-left text-[11px] px-2 py-1 rounded transition-colors ${
+                                  inst.isUH
+                                    ? 'bg-cyan-500/20 text-white hover:bg-cyan-400/30'
+                                    : 'bg-white/10 text-white hover:bg-white/20'
+                                }`}
+                              >
+                                {project.name}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                       {inst.isUH && (
                         <p className="text-[10px] font-semibold text-cyan-200 border-t border-cyan-400/50 pt-1.5 mt-1.5">
                           ★ UH Network Hospital
@@ -799,14 +874,20 @@ export default function DiscoverMap({ intakeData, onEditFilters, mode }: Discove
           ))}
 
           {/* Project Markers */}
-          {showProjects && filteredProjects.map((project) => (
+          {showProjects && filteredProjects
+            .filter((project) => clickedMarkerId !== project.id)
+            .map((project) => (
             <Marker
               key={project.id}
               anchor={[project.location.lat, project.location.lng]}
               offset={[14, 14]}
               onClick={() => setClickedMarkerId(prev => prev === project.id ? null : project.id)}
             >
-              <div className="relative">
+              <div
+                className="relative"
+                onMouseEnter={() => setHoveredLabel(project.name)}
+                onMouseLeave={() => setHoveredLabel(null)}
+              >
                 <div className={`w-7 h-7 rounded-lg border-2 border-white shadow-lg flex items-center justify-center cursor-pointer transition-transform hover:scale-110 ${
                   clickedMarkerId === project.id ? 'ring-2 ring-green-500' : ''
                 } bg-gradient-to-br from-green-500 to-teal-600`}>
@@ -814,8 +895,15 @@ export default function DiscoverMap({ intakeData, onEditFilters, mode }: Discove
                     {project.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
                   </span>
                 </div>
+                {hoveredLabel === project.name && clickedMarkerId !== project.id && (
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-[1200] pointer-events-none">
+                    <div className="bg-gray-900 text-white text-[11px] px-2.5 py-1.5 rounded-lg shadow-xl whitespace-nowrap">
+                      {project.name}
+                    </div>
+                  </div>
+                )}
                 {clickedMarkerId === project.id && (
-                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 w-52 pointer-events-auto">
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-[1300] w-52 pointer-events-auto">
                     <div className="bg-white border border-gray-200 rounded-xl shadow-xl p-3">
                       <button
                         onClick={(e) => { e.stopPropagation(); setClickedMarkerId(null); }}
@@ -857,9 +945,67 @@ export default function DiscoverMap({ intakeData, onEditFilters, mode }: Discove
               </div>
             </Marker>
           ))}
+          {showProjects && filteredProjects
+            .filter((project) => clickedMarkerId === project.id)
+            .map((project) => (
+            <Marker
+              key={`selected-${project.id}`}
+              anchor={[project.location.lat, project.location.lng]}
+              offset={[14, 14]}
+              onClick={() => setClickedMarkerId(prev => prev === project.id ? null : project.id)}
+            >
+              <div className="relative">
+                <div className="w-7 h-7 rounded-lg border-2 border-white shadow-lg flex items-center justify-center cursor-pointer transition-transform hover:scale-110 ring-2 ring-green-500 bg-gradient-to-br from-green-500 to-teal-600">
+                  <span className="text-white text-[9px] font-bold leading-none">
+                    {project.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                  </span>
+                </div>
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-[1300] w-52 pointer-events-auto">
+                  <div className="bg-white border border-gray-200 rounded-xl shadow-xl p-3">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setClickedMarkerId(null); }}
+                      className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                    <div className="flex items-center gap-2 mb-2 pr-4">
+                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-green-500 to-teal-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                        {project.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-semibold text-gray-900 truncate">{project.name}</p>
+                        <p className="text-[10px] text-gray-500 truncate">{project.lab}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <span className="px-1.5 py-0.5 text-[10px] bg-gray-100 text-gray-600 rounded">{project.status}</span>
+                      <span className={`px-1.5 py-0.5 text-[10px] rounded font-semibold ${
+                        project.matchPercentage > 70 ? 'bg-green-100 text-green-700' :
+                        project.matchPercentage > 50 ? 'bg-yellow-100 text-yellow-700' :
+                        'bg-gray-100 text-gray-700'
+                      }`}>{project.matchPercentage}% match</span>
+                    </div>
+                    <div className="flex flex-wrap gap-1 mb-2.5">
+                      {project.tags.slice(0, 2).map((t, i) => (
+                        <span key={i} className="px-1.5 py-0.5 text-[10px] bg-green-50 text-green-700 border border-green-200 rounded">{t}</span>
+                      ))}
+                    </div>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); navigate(`/project/${project.id}`); }}
+                      className="block w-full text-center px-3 py-1.5 bg-gray-900 text-white text-[11px] font-medium rounded-lg hover:bg-gray-800 transition-colors"
+                    >
+                      View Project →
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </Marker>
+          ))}
 
           {/* Collaborator Markers */}
-          {showCollaborators && displayedCollaborators.map((collab) => {
+          {showCollaborators && displayedCollaborators
+            .filter((collab) => clickedMarkerId !== collab.id)
+            .map((collab) => {
             const color = collab.role === 'doctor' ? '#3b82f6' : 
                          collab.role === 'designer' ? '#a855f7' : '#f97316';
             const size = collab.matchScore > 70 ? 20 : 16;
@@ -871,14 +1017,26 @@ export default function DiscoverMap({ intakeData, onEditFilters, mode }: Discove
                 offset={[size / 2, size / 2]}
                 onClick={() => setClickedMarkerId(prev => prev === collab.id ? null : collab.id)}
               >
-                <div className="relative">
+                <div
+                  className="relative"
+                >
                   <CustomMarker
                     color={color}
                     size={size}
                     isSelected={clickedMarkerId === collab.id}
+                    hoverLabel={collab.name}
+                    onHoverStart={() => setHoveredLabel(collab.name)}
+                    onHoverEnd={() => setHoveredLabel((prev) => (prev === collab.name ? null : prev))}
                   />
+                  {hoveredLabel === collab.name && clickedMarkerId !== collab.id && (
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-[1200] pointer-events-none">
+                      <div className="bg-gray-900 text-white text-[11px] px-2.5 py-1.5 rounded-lg shadow-xl whitespace-nowrap">
+                        {collab.name}
+                      </div>
+                    </div>
+                  )}
                   {clickedMarkerId === collab.id && (
-                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 w-52 pointer-events-auto">
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-[1300] w-52 pointer-events-auto">
                       <div className="bg-white border border-gray-200 rounded-xl shadow-xl p-3">
                         <button
                           onClick={(e) => { e.stopPropagation(); setClickedMarkerId(null); }}
@@ -906,16 +1064,81 @@ export default function DiscoverMap({ intakeData, onEditFilters, mode }: Discove
                             'bg-gray-100 text-gray-700'
                           }`}>{collab.matchScore}% match</span>
                         </div>
-                        <Link
-                          to={`/collaborator/${collab.id}`}
-                          onClick={(e) => e.stopPropagation()}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleViewCollaboratorProfile(collab);
+                          }}
                           className="block w-full text-center px-3 py-1.5 bg-gray-900 text-white text-[11px] font-medium rounded-lg hover:bg-gray-800 transition-colors"
                         >
                           View Full Profile →
-                        </Link>
+                        </button>
                       </div>
                     </div>
                   )}
+                </div>
+              </Marker>
+            );
+          })}
+          {showCollaborators && displayedCollaborators
+            .filter((collab) => clickedMarkerId === collab.id)
+            .map((collab) => {
+            const color = collab.role === 'doctor' ? '#3b82f6' :
+                         collab.role === 'designer' ? '#a855f7' : '#f97316';
+            const size = collab.matchScore > 70 ? 20 : 16;
+
+            return (
+              <Marker
+                key={`selected-${collab.id}`}
+                anchor={[collab.location.lat, collab.location.lng]}
+                offset={[size / 2, size / 2]}
+                onClick={() => setClickedMarkerId(prev => prev === collab.id ? null : collab.id)}
+              >
+                <div className="relative">
+                  <CustomMarker
+                    color={color}
+                    size={size}
+                    isSelected={true}
+                  />
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-[1300] w-52 pointer-events-auto">
+                    <div className="bg-white border border-gray-200 rounded-xl shadow-xl p-3">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setClickedMarkerId(null); }}
+                        className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                      <div className="flex items-center gap-2 mb-2 pr-4">
+                        <div className={`w-8 h-8 rounded-full bg-gradient-to-br ${getRoleColor(collab.role)} flex items-center justify-center text-white text-xs font-semibold flex-shrink-0`}>
+                          {collab.name.split(' ').map(n => n[0]).join('')}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-xs font-semibold text-gray-900 truncate">{collab.name}</p>
+                          <p className="text-[10px] text-gray-500 truncate">{collab.title}</p>
+                        </div>
+                      </div>
+                      <p className="text-[10px] text-gray-500 mb-2">{collab.institution}</p>
+                      <div className="flex items-center gap-1.5 mb-2.5">
+                        <span className={`px-1.5 py-0.5 text-[10px] rounded-full font-semibold border ${getRoleBadgeColor(collab.role)}`}>
+                          {collab.role.charAt(0).toUpperCase() + collab.role.slice(1)}
+                        </span>
+                        <span className={`px-1.5 py-0.5 text-[10px] rounded font-semibold ${
+                          collab.matchScore > 70 ? 'bg-green-100 text-green-700' :
+                          collab.matchScore > 50 ? 'bg-yellow-100 text-yellow-700' :
+                          'bg-gray-100 text-gray-700'
+                        }`}>{collab.matchScore}% match</span>
+                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleViewCollaboratorProfile(collab);
+                        }}
+                        className="block w-full text-center px-3 py-1.5 bg-gray-900 text-white text-[11px] font-medium rounded-lg hover:bg-gray-800 transition-colors"
+                      >
+                        View Full Profile →
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </Marker>
             );
@@ -987,7 +1210,7 @@ export default function DiscoverMap({ intakeData, onEditFilters, mode }: Discove
               }}
             />
           </Overlay>
-        </Map>
+        </PigeonMap>
 
       </div>
 
@@ -1005,6 +1228,53 @@ export default function DiscoverMap({ intakeData, onEditFilters, mode }: Discove
               });
             }}
           />
+        )}
+      </AnimatePresence>
+
+      {/* Private profile modal */}
+      <AnimatePresence>
+        {privateProfileName && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[2000]"
+              onClick={() => setPrivateProfileName(null)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96, y: 8 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.96, y: 8 }}
+              className="fixed inset-0 z-[2001] flex items-center justify-center p-4"
+            >
+              <div className="w-full max-w-sm bg-white border border-gray-200 rounded-xl shadow-2xl p-5">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h3 className="text-base font-semibold text-gray-900">Profile is private</h3>
+                    <p className="mt-1 text-sm text-gray-600">
+                      {privateProfileName}'s full profile is not publicly available right now.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setPrivateProfileName(null)}
+                    className="p-1.5 rounded-md hover:bg-gray-100 transition-colors"
+                    aria-label="Close private profile message"
+                  >
+                    <X className="h-4 w-4 text-gray-500" />
+                  </button>
+                </div>
+                <div className="mt-4 flex justify-end">
+                  <button
+                    onClick={() => setPrivateProfileName(null)}
+                    className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </div>

@@ -3,7 +3,7 @@ import { Link } from "react-router";
 import { Header } from "../components/Header";
 import {
   Search, SlidersHorizontal, UserCircle2,
-  Loader2, X, ExternalLink, ChevronDown, ChevronUp, Info, Lock,
+  Loader2, X, ExternalLink, ChevronDown, ChevronUp, Lock,
 } from "lucide-react";
 import { ContactModal } from "../components/ContactModal";
 import DiscoverMap from "./DiscoverMap";
@@ -23,15 +23,10 @@ interface ActiveFilters {
   interests: string[];
   skills: string[];
   location: string[];
-  // Below are UI-only — not yet queryable via ORCID
-  reasons: string[];
-  availability: string[];
-  preferredOrgType: string[];
 }
 
 const EMPTY_FILTERS: ActiveFilters = {
   role: [], interests: [], skills: [], location: [],
-  reasons: [], availability: [], preferredOrgType: [],
 };
 
 // ─── ORCID-queryable filter options ──────────────────────────────────────────
@@ -362,32 +357,17 @@ function FilterPanel({
   onChange: (key: keyof ActiveFilters, value: string) => void;
   onClear: () => void;
 }) {
-  type SectionDef =
-    | { key: keyof typeof FILTER_OPTIONS; label: string; color: TagColor; unavailable?: false }
-    | { key: keyof ActiveFilters; label: string; color: TagColor; unavailable: true; note: string };
+  type SectionDef = { key: keyof typeof FILTER_OPTIONS; label: string; color: TagColor };
 
   const sections: SectionDef[] = [
     { key: "role",            label: "Role",              color: "blue"   },
-    { key: "interests",       label: "Interests",         color: "gray"   },
+    { key: "interests",       label: "Interests",         color: "purple" },
     { key: "skills",          label: "Skills",            color: "orange" },
-    { key: "location",        label: "Location",          color: "teal"   },
-    {
-      key: "reasons", label: "Reasons", color: "purple", unavailable: true,
-      note: "Shown on enriched profiles; filter support can be added next",
-    },
-    {
-      key: "availability", label: "Availability", color: "green", unavailable: true,
-      note: "Shown on enriched profiles; filter support can be added next",
-    },
-    {
-      key: "preferredOrgType", label: "Preference of Org", color: "rose", unavailable: true,
-      note: "Shown on enriched profiles; filter support can be added next",
-    },
+    { key: "location",        label: "Location",          color: "orange" },
   ];
 
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     role: true, interests: false, skills: false, location: false,
-    reasons: false, availability: false, preferredOrgType: false,
   });
   const toggleSection = (key: string) =>
     setOpenSections((p) => ({ ...p, [key]: !p[key] }));
@@ -429,9 +409,6 @@ function FilterPanel({
                     {active.length}
                   </span>
                 )}
-                {s.unavailable && (
-                  <Info className="h-3 w-3 text-gray-400" />
-                )}
               </span>
               {isOpen
                 ? <ChevronUp className="h-3.5 w-3.5 text-gray-400" />
@@ -440,31 +417,24 @@ function FilterPanel({
 
             {isOpen && (
               <div className="px-4 pb-3">
-                {s.unavailable ? (
-                  <p className="text-[11px] text-gray-400 italic flex items-center gap-1.5">
-                    <Info className="h-3 w-3 shrink-0" />
-                    {s.note}
-                  </p>
-                ) : (
-                  <div className="flex flex-wrap gap-1.5">
-                    {(FILTER_OPTIONS[s.key as keyof typeof FILTER_OPTIONS] ?? []).map((opt) => {
-                      const selected = active.includes(opt);
-                      return (
-                        <button
-                          key={opt}
-                          onClick={() => onChange(s.key, opt)}
-                          className={`px-2.5 py-1 text-[11px] border rounded-md transition-colors ${
-                            selected
-                              ? chipColors[s.color] + " font-medium"
-                              : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"
-                          }`}
-                        >
-                          {opt}
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
+                <div className="flex flex-wrap gap-1.5">
+                  {(FILTER_OPTIONS[s.key as keyof typeof FILTER_OPTIONS] ?? []).map((opt) => {
+                    const selected = active.includes(opt);
+                    return (
+                      <button
+                        key={opt}
+                        onClick={() => onChange(s.key, opt)}
+                        className={`px-2.5 py-1 text-[11px] border rounded-md transition-colors ${
+                          selected
+                            ? chipColors[s.color] + " font-medium"
+                            : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"
+                        }`}
+                      >
+                        {opt}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             )}
           </div>
@@ -906,7 +876,7 @@ export default function FindCollaborators() {
                     : "border-transparent text-gray-500 hover:text-gray-700"
                 }`}
               >
-                {tab === "browse" ? "Search" : "Discover"}
+                {tab === "browse" ? "Browse" : "Discover"}
               </button>
             ))}
           </div>
