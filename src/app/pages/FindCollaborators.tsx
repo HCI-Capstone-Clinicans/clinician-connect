@@ -58,90 +58,6 @@ const FILTER_OPTIONS = {
   ],
 };
 
-function MultiSelect({
-  placeholder,
-  options,
-  selected,
-  onChange,
-}: {
-  placeholder: string;
-  options: string[];
-  selected: string[];
-  onChange: (values: string[]) => void;
-}) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  const listRef = useRef<HTMLDivElement>(null);
-  const [canScrollMore, setCanScrollMore] = useState(true);
-
-  useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, []);
-
-  const handleScroll = () => {
-    const el = listRef.current;
-    if (!el) return;
-    setCanScrollMore(el.scrollTop + el.clientHeight < el.scrollHeight - 4);
-  };
-
-  useEffect(() => {
-    if (open) setCanScrollMore(true);
-  }, [open]);
-
-  const toggle = (val: string) =>
-    onChange(selected.includes(val) ? selected.filter(v => v !== val) : [...selected, val]);
-
-  return (
-    <div ref={ref} className="relative">
-      <button
-        type="button"
-        onClick={() => setOpen(o => !o)}
-        className="w-full flex items-center justify-between px-3 py-2 text-[13px] border border-gray-300 rounded-md bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-      >
-        <span className="text-gray-900">
-          {selected.length ? `${selected.length} selected` : placeholder}
-        </span>
-        <ChevronDown className="h-4 w-4 text-gray-400 shrink-0" />
-      </button>
-      {open && (
-        <div className="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg">
-          <div
-            ref={listRef}
-            onScroll={handleScroll}
-            className="max-h-48 overflow-y-auto"
-          >
-            {options.map(opt => (
-              <label
-                key={opt}
-                className="flex items-center gap-2.5 px-3 py-2 text-[13px] hover:bg-gray-50 cursor-pointer"
-              >
-                <input
-                  type="checkbox"
-                  checked={selected.includes(opt)}
-                  onChange={() => toggle(opt)}
-                  className="h-3.5 w-3.5 rounded border-gray-300 text-gray-900 accent-gray-900"
-                />
-                <span className={selected.includes(opt) ? "text-gray-900 font-medium" : "text-gray-700"}>
-                  {opt}
-                </span>
-              </label>
-            ))}
-          </div>
-          {canScrollMore && (
-            <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-8 rounded-b-md bg-gradient-to-t from-white to-transparent flex items-end justify-center pb-1">
-              <span className="text-[10px] text-gray-400">scroll for more</span>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
 // ─── Heuristic alias map ──────────────────────────────────────────────────────
 // Maps UI display labels → one or more ORCID keyword terms.
 // ORCID only supports: keyword:, affiliation-org-name:, given-names:,
@@ -943,31 +859,91 @@ export default function FindCollaborators() {
 
             {showFilters && (
               <div className="bg-white border border-gray-200 rounded-lg p-4 mb-6">
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
-                  <MultiSelect
-                    placeholder="Role"
-                    options={FILTER_OPTIONS.role}
-                    selected={activeFilters.role}
-                    onChange={(vals) => setActiveFilters((prev) => ({ ...prev, role: vals }))}
-                  />
-                  <MultiSelect
-                    placeholder="Interests"
-                    options={FILTER_OPTIONS.interests}
-                    selected={activeFilters.interests}
-                    onChange={(vals) => setActiveFilters((prev) => ({ ...prev, interests: vals }))}
-                  />
-                  <MultiSelect
-                    placeholder="Skills"
-                    options={FILTER_OPTIONS.skills}
-                    selected={activeFilters.skills}
-                    onChange={(vals) => setActiveFilters((prev) => ({ ...prev, skills: vals }))}
-                  />
-                  <MultiSelect
-                    placeholder="Location"
-                    options={FILTER_OPTIONS.location}
-                    selected={activeFilters.location}
-                    onChange={(vals) => setActiveFilters((prev) => ({ ...prev, location: vals }))}
-                  />
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                  <div className="border border-gray-200 rounded-md p-3">
+                    <p className="text-[11px] font-medium text-gray-500 uppercase tracking-wide mb-2">Role</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {FILTER_OPTIONS.role.map((option) => {
+                        const selected = activeFilters.role.includes(option);
+                        return (
+                          <button
+                            key={option}
+                            onClick={() => handleFilterChange("role", option)}
+                            className={`px-2.5 py-1 text-[11px] border rounded-md transition-colors ${
+                              selected
+                                ? "bg-blue-50 text-blue-700 border-blue-200 font-medium"
+                                : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"
+                            }`}
+                          >
+                            {option}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <div className="border border-gray-200 rounded-md p-3">
+                    <p className="text-[11px] font-medium text-gray-500 uppercase tracking-wide mb-2">Interests</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {FILTER_OPTIONS.interests.map((option) => {
+                        const selected = activeFilters.interests.includes(option);
+                        return (
+                          <button
+                            key={option}
+                            onClick={() => handleFilterChange("interests", option)}
+                            className={`px-2.5 py-1 text-[11px] border rounded-md transition-colors ${
+                              selected
+                                ? "bg-purple-50 text-purple-700 border-purple-200 font-medium"
+                                : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"
+                            }`}
+                          >
+                            {option}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <div className="border border-gray-200 rounded-md p-3">
+                    <p className="text-[11px] font-medium text-gray-500 uppercase tracking-wide mb-2">Skills</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {FILTER_OPTIONS.skills.map((option) => {
+                        const selected = activeFilters.skills.includes(option);
+                        return (
+                          <button
+                            key={option}
+                            onClick={() => handleFilterChange("skills", option)}
+                            className={`px-2.5 py-1 text-[11px] border rounded-md transition-colors ${
+                              selected
+                                ? "bg-orange-50 text-orange-700 border-orange-200 font-medium"
+                                : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"
+                            }`}
+                          >
+                            {option}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <div className="border border-gray-200 rounded-md p-3">
+                    <p className="text-[11px] font-medium text-gray-500 uppercase tracking-wide mb-2">Location</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {FILTER_OPTIONS.location.map((option) => {
+                        const selected = activeFilters.location.includes(option);
+                        return (
+                          <button
+                            key={option}
+                            onClick={() => handleFilterChange("location", option)}
+                            className={`px-2.5 py-1 text-[11px] border rounded-md transition-colors ${
+                              selected
+                                ? "bg-teal-50 text-teal-700 border-teal-200 font-medium"
+                                : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"
+                            }`}
+                          >
+                            {option}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
                 </div>
 
                 {filterCount > 0 && (

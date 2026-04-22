@@ -448,28 +448,73 @@ export default function FindProjects() {
             {/* Collapsible filter panel */}
             {showFilters && (
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 pt-3 border-t border-gray-200">
-                <SingleSelect
-                  placeholder="Institution"
-                  value={selectedInstitution}
-                  onChange={setSelectedInstitution}
-                  options={[
-                    { label: "UH Cleveland Medical Center", value: "uh" },
-                    { label: "Cleveland Clinic", value: "clinic" },
-                    { label: "Case Western Reserve University", value: "cwru" },
-                  ]}
-                />
-                <MultiSelect
-                  placeholder="Skills"
-                  options={SKILL_OPTIONS}
-                  selected={selectedSkills}
-                  onChange={setSelectedSkills}
-                />
-                <MultiSelect
-                  placeholder="Domains"
-                  options={DOMAIN_OPTIONS}
-                  selected={selectedDomains}
-                  onChange={setSelectedDomains}
-                />
+                <div className="border border-gray-200 rounded-md p-3">
+                  <p className="text-[11px] font-medium text-gray-500 uppercase tracking-wide mb-2">Institution</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {[
+                      { label: "UH Cleveland Medical Center", value: "uh" },
+                      { label: "Cleveland Clinic", value: "clinic" },
+                      { label: "Case Western Reserve University", value: "cwru" },
+                    ].map((option) => {
+                      const selected = selectedInstitution === option.value;
+                      return (
+                        <button
+                          key={option.value}
+                          onClick={() => setSelectedInstitution(selected ? "" : option.value)}
+                          className={`px-2.5 py-1 text-[11px] border rounded-md transition-colors ${
+                            selected
+                              ? "bg-orange-50 text-orange-700 border-orange-200 font-medium"
+                              : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"
+                          }`}
+                        >
+                          {option.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+                <div className="border border-gray-200 rounded-md p-3">
+                  <p className="text-[11px] font-medium text-gray-500 uppercase tracking-wide mb-2">Skills</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {SKILL_OPTIONS.map((option) => {
+                      const selected = selectedSkills.includes(option);
+                      return (
+                        <button
+                          key={option}
+                          onClick={() => setSelectedSkills(selected ? selectedSkills.filter(v => v !== option) : [...selectedSkills, option])}
+                          className={`px-2.5 py-1 text-[11px] border rounded-md transition-colors ${
+                            selected
+                              ? "bg-purple-50 text-purple-700 border-purple-200 font-medium"
+                              : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"
+                          }`}
+                        >
+                          {option}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+                <div className="border border-gray-200 rounded-md p-3">
+                  <p className="text-[11px] font-medium text-gray-500 uppercase tracking-wide mb-2">Domains</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {DOMAIN_OPTIONS.map((option) => {
+                      const selected = selectedDomains.includes(option);
+                      return (
+                        <button
+                          key={option}
+                          onClick={() => setSelectedDomains(selected ? selectedDomains.filter(v => v !== option) : [...selectedDomains, option])}
+                          className={`px-2.5 py-1 text-[11px] border rounded-md transition-colors ${
+                            selected
+                              ? "bg-blue-50 text-blue-700 border-blue-200 font-medium"
+                              : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"
+                          }`}
+                        >
+                          {option}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
             )}
 
