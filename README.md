@@ -13,7 +13,7 @@
   ```
   2. Navigate into project folder
   ```
-  cd ~/HCI-capstone
+  cd ~/clinician-connect
   ```
   3. Install dependencies
   - Install Node.js if you haven't already: https://nodejs.org
@@ -27,5 +27,5 @@
   ```
   6. Open in browser
   ```
-  http://localhost:5173
+  http://localhost:5174/clinician-connect/
   ```
