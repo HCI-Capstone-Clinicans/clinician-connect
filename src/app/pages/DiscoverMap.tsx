@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { Map, Marker, Overlay } from 'pigeon-maps';
 import { motion, AnimatePresence } from 'motion/react';
 import {
@@ -7,9 +7,7 @@ import {
   X,
   ChevronRight,
   Mail,
-  Sparkles,
   SlidersHorizontal,
-  Target,
 
   MapPin,
   Navigation,
@@ -104,6 +102,30 @@ export default function DiscoverMap({ intakeData, onEditFilters, mode }: Discove
   const [showFilters, setShowFilters] = useState(true);
   const [matchType, setMatchType] = useState<'exact' | 'adjacent'>('exact');
   const [radiusFilter, setRadiusFilter] = useState(1);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+
+  // Auto-zoom so the circle edges nearly touch the map edges
+  const computeZoom = (radius: number) => {
+    const EARTH_CIRC_MILES = 24901;
+    const lat = userLocation[0];
+    const cosLat = Math.cos(lat * Math.PI / 180);
+    const containerSize = mapContainerRef.current
+      ? Math.min(mapContainerRef.current.offsetWidth, mapContainerRef.current.offsetHeight)
+      : 600;
+    const targetDiameterPx = containerSize * 0.88;
+    const zoom = Math.log2((targetDiameterPx * EARTH_CIRC_MILES * cosLat) / (radius * 2 * 256));
+    return Math.max(10, Math.min(16, Math.round(zoom)));
+  };
+
+  useEffect(() => {
+    setMapZoom(computeZoom(radiusFilter));
+    setMapCenter([41.5045, -81.6082]);
+  }, [radiusFilter]);
+
+  // Recompute zoom on mount once the ref is available
+  useEffect(() => {
+    setMapZoom(computeZoom(radiusFilter));
+  }, []);
   const [appliedFilters, setAppliedFilters] = useState<Record<string, string[]>>({
     areaOfInterest: intakeData?.topicArea ?? []
   });
@@ -111,6 +133,8 @@ export default function DiscoverMap({ intakeData, onEditFilters, mode }: Discove
   const [mapZoom, setMapZoom] = useState(12);
   const [hoveredMarker, setHoveredMarker] = useState<string | null>(null);
   const [showEditCriteria, setShowEditCriteria] = useState(false);
+  const [showAllResults, setShowAllResults] = useState(false);
+  const [hasAppliedFilter, setHasAppliedFilter] = useState(false);
   const DEFAULT_INTAKE: IntakeData = {
     role: null,
     collaborationIntent: [],
@@ -339,6 +363,7 @@ export default function DiscoverMap({ intakeData, onEditFilters, mode }: Discove
   };
 
   const toggleDisciplineFilter = (role: string) => {
+    setHasAppliedFilter(true);
     if (appliedFilters.role && appliedFilters.role.includes(role)) {
       setAppliedFilters({
         ...appliedFilters,
@@ -412,7 +437,7 @@ export default function DiscoverMap({ intakeData, onEditFilters, mode }: Discove
   };
 
   return (
-    <div className="h-screen flex overflow-hidden bg-gray-50">
+    <div className="h-full flex overflow-hidden bg-gray-50 gap-4">
       {/* Side Panel */}
       <AnimatePresence>
         {showFilters && (
@@ -421,102 +446,54 @@ export default function DiscoverMap({ intakeData, onEditFilters, mode }: Discove
             animate={{ x: 0 }}
             exit={{ x: -400 }}
             transition={{ type: 'spring', damping: 25 }}
-            className="w-96 bg-white border-r border-gray-200 flex flex-col overflow-hidden z-10"
+            className="w-72 bg-white border border-gray-200 rounded-xl flex flex-col overflow-hidden z-10 shadow-sm"
           >
             {/* Panel Header */}
-            <div className="p-6 border-b border-gray-200">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold text-gray-900">Discover</h2>
+            <div className="px-4 py-4 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h2 className="text-base font-semibold text-gray-900">Discover</h2>
                 <button
                   onClick={() => setShowFilters(false)}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
                 >
-                  <X className="h-5 w-5 text-gray-500" />
+                  <X className="h-4 w-4 text-gray-500" />
                 </button>
-              </div>
-
-              {/* Match Type Toggle */}
-              <div className="flex gap-2 mb-4">
-                <button
-                  onClick={() => setMatchType('exact')}
-                  className={`flex-1 px-4 py-2.5 rounded-lg font-medium text-sm transition-all ${
-                    matchType === 'exact'
-                      ? 'bg-gray-900 text-white'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
-                >
-                  <Target className="h-4 w-4 inline mr-1.5" />
-                  Exact Match
-                </button>
-                <button
-                  onClick={() => setMatchType('adjacent')}
-                  className={`flex-1 px-4 py-2.5 rounded-lg font-medium text-sm transition-all ${
-                    matchType === 'adjacent'
-                      ? 'bg-gray-900 text-white'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
-                >
-                  <Sparkles className="h-4 w-4 inline mr-1.5" />
-                  Adjacent
-                </button>
-              </div>
-
-              {/* Quick Stats */}
-              <div className="grid grid-cols-2 gap-2">
-                {showProjects && (
-                  <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg">
-                    <div className="text-2xl font-bold text-gray-900">{filteredProjects.length}</div>
-                    <div className="text-xs text-gray-600">Projects</div>
-                  </div>
-                )}
-                {showCollaborators && (
-                  <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg">
-                    <div className="text-2xl font-bold text-gray-900">{collaboratorsWithScores.length}</div>
-                    <div className="text-xs text-gray-600">People</div>
-                  </div>
-                )}
-                <div className={`p-3 bg-gray-50 border border-gray-200 rounded-lg ${showProjects && showCollaborators ? 'col-span-2' : ''}`}>
-                  <div className="text-2xl font-bold text-gray-900">
-                    {showCollaborators ? collaboratorsWithScores.filter(c => c.matchScore > 70).length : filteredProjects.filter(p => p.matchPercentage > 70).length}
-                  </div>
-                  <div className="text-xs text-gray-600">Strong Matches</div>
-                </div>
               </div>
             </div>
 
             {/* Filters */}
-            <div className="p-6 border-b border-gray-200">
-              <div className="flex items-center gap-2 mb-4">
-                <SlidersHorizontal className="h-4 w-4 text-gray-500" />
-                <h3 className="font-semibold text-gray-900">Filters</h3>
+            <div className="px-4 py-4 border-b border-gray-200">
+              <div className="flex items-center gap-2 mb-3">
+                <SlidersHorizontal className="h-3.5 w-3.5 text-gray-500" />
+                <h3 className="text-sm font-semibold text-gray-900">Filters</h3>
               </div>
 
-              {/* Discipline Filter */}
-              <div className="mb-4">
-                <label className="text-sm font-medium text-gray-700 mb-2 block">
-                  Discipline
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  {['doctor', 'designer', 'engineer'].map(role => (
-                    <button
-                      key={role}
-                      onClick={() => toggleDisciplineFilter(role)}
-                      className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-all ${
-                        appliedFilters.role && appliedFilters.role.includes(role)
-                          ? getRoleBadgeColor(role)
-                          : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
-                      }`}
-                    >
-                      {role.charAt(0).toUpperCase() + role.slice(1)}
-                      {appliedFilters.role && appliedFilters.role.includes(role) && 's'}
-                    </button>
-                  ))}
+              {/* Discipline Filter — collaborators mode only */}
+              {showCollaborators && (
+                <div className="mb-3">
+                  <label className="text-xs font-medium text-gray-600 mb-1.5 block">Discipline</label>
+                  <div className="flex flex-wrap gap-1.5">
+                    {['doctor', 'designer', 'engineer'].map(role => (
+                      <button
+                        key={role}
+                        onClick={() => toggleDisciplineFilter(role)}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-medium border transition-all ${
+                          appliedFilters.role && appliedFilters.role.includes(role)
+                            ? getRoleBadgeColor(role)
+                            : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
+                        }`}
+                      >
+                        {role.charAt(0).toUpperCase() + role.slice(1)}
+                        {appliedFilters.role && appliedFilters.role.includes(role) && 's'}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Radius Filter */}
-              <div className="mb-4">
-                <label className="text-sm font-medium text-gray-700 mb-2 block">
+              <div className="mb-3">
+                <label className="text-xs font-medium text-gray-600 mb-1.5 block">
                   Search Radius: {radiusFilter} miles
                 </label>
                 <input
@@ -525,123 +502,154 @@ export default function DiscoverMap({ intakeData, onEditFilters, mode }: Discove
                   max="10"
                   step="0.5"
                   value={radiusFilter}
-                  onChange={(e) => setRadiusFilter(Number(e.target.value))}
+                  onChange={(e) => { setRadiusFilter(Number(e.target.value)); setHasAppliedFilter(true); }}
                   className="w-full"
                 />
               </div>
 
               <button
-                onClick={() => setShowEditCriteria(true)}
-                className="w-full px-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                onClick={() => { setShowEditCriteria(true); setHasAppliedFilter(true); }}
+                className="w-full px-3 py-2 text-xs font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
               >
                 Edit Search Criteria
               </button>
             </div>
 
             {/* Results List */}
-            <div className="flex-1 overflow-y-auto p-6">
-              <div className="mb-3 flex items-center justify-between">
-                <h3 className="font-semibold text-gray-900">
-                  Results ({(showProjects ? filteredProjects.length : 0) + (showCollaborators ? displayedCollaborators.length : 0)})
-                </h3>
-              </div>
-
-              {/* Projects */}
-              {showProjects && filteredProjects.length > 0 && (
-                <div className="mb-4">
-                  <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-400 mb-2">Projects</p>
-                  <div className="space-y-2">
-                    {filteredProjects.map((project) => (
-                      <motion.button
-                        key={project.id}
-                        onClick={() => {
-                          setClickedMarkerId(prev => prev === project.id ? null : project.id);
-                          setMapCenter([project.location.lat, project.location.lng]);
-                          setMapZoom(15);
-                        }}
-                        whileHover={{ scale: 1.01 }}
-                        className={`w-full p-3 rounded-xl border-2 transition-all text-left ${
-                          clickedMarkerId === project.id
-                            ? 'border-green-500 bg-green-50'
-                            : 'border-gray-200 hover:border-gray-300 bg-white'
-                        }`}
-                      >
-                        <div className="flex items-start gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-green-500 to-teal-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
-                            {project.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between gap-2 mb-0.5">
-                              <h4 className="font-semibold text-gray-900 text-sm truncate">{project.name}</h4>
-                              <span className={`px-2 py-0.5 rounded-full text-xs font-semibold flex-shrink-0 ${
-                                project.matchPercentage > 70 ? 'bg-green-100 text-green-700' :
-                                project.matchPercentage > 50 ? 'bg-yellow-100 text-yellow-700' :
-                                'bg-gray-100 text-gray-700'
-                              }`}>{project.matchPercentage}%</span>
-                            </div>
-                            <p className="text-xs text-gray-500 truncate">{project.lab}</p>
-                            <div className="flex flex-wrap gap-1 mt-1.5">
-                              {project.tags.slice(0, 2).map((t, i) => (
-                                <span key={i} className="px-1.5 py-0.5 text-[10px] bg-green-50 text-green-700 border border-green-200 rounded">{t}</span>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-                      </motion.button>
-                    ))}
+            <div className="flex-1 overflow-y-auto px-4 py-4">
+              {!hasAppliedFilter ? (
+                <div className="flex flex-col items-center justify-center py-8 text-center">
+                  <SlidersHorizontal className="h-7 w-7 text-gray-300 mb-2" />
+                  <p className="text-xs text-gray-400">Apply a filter to see results</p>
+                </div>
+              ) : (
+                <>
+                  <div className="mb-2 flex items-center justify-between">
+                    <h3 className="text-sm font-semibold text-gray-900">
+                      Results ({(showProjects ? filteredProjects.length : 0) + (showCollaborators ? displayedCollaborators.length : 0)})
+                    </h3>
                   </div>
-                </div>
-              )}
 
-              {/* Collaborators */}
-              {showCollaborators && displayedCollaborators.length > 0 && (
-                <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-400 mb-2">People</p>
-                  <div className="space-y-2">
-                    {displayedCollaborators.map((collab) => (
-                      <motion.button
-                        key={collab.id}
-                        onClick={() => {
-                          setClickedMarkerId(prev => prev === collab.id ? null : collab.id);
-                          setMapCenter([collab.location.lat, collab.location.lng]);
-                          setMapZoom(15);
-                        }}
-                        whileHover={{ scale: 1.01 }}
-                        className={`w-full p-3 rounded-xl border-2 transition-all text-left ${
-                          clickedMarkerId === collab.id
-                            ? 'border-gray-900 bg-gray-50 shadow-sm'
-                            : 'border-gray-200 hover:border-gray-300 bg-white'
-                        }`}
-                      >
-                        <div className="flex items-start gap-3">
-                          <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${getRoleColor(collab.role)} flex items-center justify-center text-white font-semibold text-sm flex-shrink-0`}>
-                            {collab.name.split(' ').map(n => n[0]).join('')}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between gap-2 mb-0.5">
-                              <h4 className="font-semibold text-gray-900 text-sm truncate">{collab.name}</h4>
-                              <span className={`px-2 py-0.5 rounded-full text-xs font-semibold flex-shrink-0 ${
-                                collab.matchScore > 70 ? 'bg-green-100 text-green-700' :
-                                collab.matchScore > 50 ? 'bg-yellow-100 text-yellow-700' :
-                                'bg-gray-100 text-gray-700'
-                              }`}>{collab.matchScore}%</span>
-                            </div>
-                            <p className="text-xs text-gray-600 truncate">{collab.title}</p>
-                            <p className="text-xs text-gray-500 truncate">{collab.institution}</p>
-                          </div>
+                  {(() => {
+                    const totalCount = (showProjects ? filteredProjects.length : 0) + (showCollaborators ? displayedCollaborators.length : 0);
+
+                    if (totalCount === 0) {
+                      return (
+                        <div className="flex flex-col items-center justify-center py-6 text-center">
+                          <MapPin className="h-7 w-7 text-gray-300 mb-2" />
+                          <p className="text-xs text-gray-500">No results within {radiusFilter} miles.</p>
+                          <p className="text-xs text-gray-400 mt-1">Try increasing the search radius.</p>
                         </div>
-                      </motion.button>
-                    ))}
-                  </div>
-                </div>
-              )}
+                      );
+                    }
 
-              {(showProjects ? filteredProjects.length : 0) + (showCollaborators ? displayedCollaborators.length : 0) === 0 && (
-                <div className="flex flex-col items-center justify-center py-12 text-center">
-                  <MapPin className="h-8 w-8 text-gray-300 mb-3" />
-                  <p className="text-sm text-gray-500">No results within {radiusFilter} miles.</p>
-                  <p className="text-xs text-gray-400 mt-1">Try increasing the search radius.</p>
-                </div>
+                    const allItems: Array<{ type: 'project' | 'collab'; id: string; node: React.ReactNode }> = [];
+
+                    if (showProjects) {
+                      filteredProjects.forEach((project) => {
+                        allItems.push({
+                          type: 'project',
+                          id: project.id,
+                          node: (
+                            <motion.button
+                              key={project.id}
+                              onClick={() => {
+                                setClickedMarkerId(prev => prev === project.id ? null : project.id);
+                                setMapCenter([project.location.lat, project.location.lng]);
+                                setMapZoom(15);
+                              }}
+                              whileHover={{ scale: 1.01 }}
+                              className={`w-full p-2.5 rounded-xl border-2 transition-all text-left ${
+                                clickedMarkerId === project.id
+                                  ? 'border-green-500 bg-green-50'
+                                  : 'border-gray-200 hover:border-gray-300 bg-white'
+                              }`}
+                            >
+                              <div className="flex items-start gap-2">
+                                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-green-500 to-teal-600 flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
+                                  {project.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center justify-between gap-1 mb-0.5">
+                                    <h4 className="font-semibold text-gray-900 text-xs truncate">{project.name}</h4>
+                                    <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-semibold flex-shrink-0 ${
+                                      project.matchPercentage > 70 ? 'bg-green-100 text-green-700' :
+                                      project.matchPercentage > 50 ? 'bg-yellow-100 text-yellow-700' :
+                                      'bg-gray-100 text-gray-700'
+                                    }`}>{project.matchPercentage}%</span>
+                                  </div>
+                                  <p className="text-[10px] text-gray-500 truncate">{project.lab}</p>
+                                </div>
+                              </div>
+                            </motion.button>
+                          ),
+                        });
+                      });
+                    }
+
+                    if (showCollaborators) {
+                      displayedCollaborators.forEach((collab) => {
+                        allItems.push({
+                          type: 'collab',
+                          id: collab.id,
+                          node: (
+                            <motion.button
+                              key={collab.id}
+                              onClick={() => {
+                                setClickedMarkerId(prev => prev === collab.id ? null : collab.id);
+                                setMapCenter([collab.location.lat, collab.location.lng]);
+                                setMapZoom(15);
+                              }}
+                              whileHover={{ scale: 1.01 }}
+                              className={`w-full p-2.5 rounded-xl border-2 transition-all text-left ${
+                                clickedMarkerId === collab.id
+                                  ? 'border-gray-900 bg-gray-50 shadow-sm'
+                                  : 'border-gray-200 hover:border-gray-300 bg-white'
+                              }`}
+                            >
+                              <div className="flex items-start gap-2">
+                                <div className={`w-8 h-8 rounded-full bg-gradient-to-br ${getRoleColor(collab.role)} flex items-center justify-center text-white font-semibold text-xs flex-shrink-0`}>
+                                  {collab.name.split(' ').map(n => n[0]).join('')}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center justify-between gap-1 mb-0.5">
+                                    <h4 className="font-semibold text-gray-900 text-xs truncate">{collab.name}</h4>
+                                    <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-semibold flex-shrink-0 ${
+                                      collab.matchScore > 70 ? 'bg-green-100 text-green-700' :
+                                      collab.matchScore > 50 ? 'bg-yellow-100 text-yellow-700' :
+                                      'bg-gray-100 text-gray-700'
+                                    }`}>{collab.matchScore}%</span>
+                                  </div>
+                                  <p className="text-[10px] text-gray-600 truncate">{collab.title}</p>
+                                  <p className="text-[10px] text-gray-500 truncate">{collab.institution}</p>
+                                </div>
+                              </div>
+                            </motion.button>
+                          ),
+                        });
+                      });
+                    }
+
+                    const visibleItems = showAllResults ? allItems : allItems.slice(0, 3);
+                    const hasMore = allItems.length > 3;
+
+                    return (
+                      <div className="space-y-1.5">
+                        {visibleItems.map(item => (
+                          <div key={item.id}>{item.node}</div>
+                        ))}
+                        {hasMore && (
+                          <button
+                            onClick={() => setShowAllResults(prev => !prev)}
+                            className="w-full py-1.5 text-xs font-medium text-gray-500 hover:text-gray-700 transition-colors"
+                          >
+                            {showAllResults ? 'Show less' : `See ${allItems.length - 3} more`}
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })()}
+                </>
               )}
             </div>
           </motion.div>
@@ -649,7 +657,7 @@ export default function DiscoverMap({ intakeData, onEditFilters, mode }: Discove
       </AnimatePresence>
 
       {/* Map Container */}
-      <div className="flex-1 relative">
+      <div ref={mapContainerRef} className="flex-1 relative rounded-xl overflow-hidden border border-gray-200 shadow-sm">
         {/* Floating Controls */}
         {!showFilters && (
           <button
@@ -662,7 +670,7 @@ export default function DiscoverMap({ intakeData, onEditFilters, mode }: Discove
         )}
 
         {/* Floating Chips */}
-        <div className="absolute top-6 right-6 z-[1000] flex flex-wrap gap-2 max-w-md">
+        <div className="absolute top-6 left-6 z-[1000] flex flex-wrap gap-2 max-w-md">
           {(intakeData?.topicArea ?? []).slice(0, 3).map((topic, idx) => (
             <div
               key={idx}
@@ -679,7 +687,7 @@ export default function DiscoverMap({ intakeData, onEditFilters, mode }: Discove
         </div>
 
         {/* Map Legend */}
-        <div className="absolute bottom-6 left-6 z-[1000] bg-white rounded-lg shadow-lg p-4">
+        <div className="absolute top-6 right-6 z-[1000] bg-white rounded-lg shadow-lg p-4">
           <h4 className="text-xs font-semibold text-gray-900 mb-2">Legend</h4>
           <div className="space-y-1.5">
             <div className="flex items-center gap-2">
@@ -691,29 +699,27 @@ export default function DiscoverMap({ intakeData, onEditFilters, mode }: Discove
               </div>
               <span className="text-xs text-gray-700 font-semibold">Your Location</span>
             </div>
-            <div className="flex items-center gap-2 pt-1 border-t border-gray-200 mt-1.5">
-              <div className="w-3 h-3 rounded-full bg-blue-500" />
-              <span className="text-xs text-gray-600">Doctors</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-purple-500" />
-              <span className="text-xs text-gray-600">Designers</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-orange-500" />
-              <span className="text-xs text-gray-600">Engineers</span>
-            </div>
+            {showCollaborators && (
+              <>
+                <div className="flex items-center gap-2 pt-1 border-t border-gray-200 mt-1.5">
+                  <div className="w-3 h-3 rounded-full bg-blue-500" />
+                  <span className="text-xs text-gray-600">Doctors</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-purple-500" />
+                  <span className="text-xs text-gray-600">Designers</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-orange-500" />
+                  <span className="text-xs text-gray-600">Engineers</span>
+                </div>
+              </>
+            )}
             <div className="flex items-center gap-2 pt-1 border-t border-gray-200 mt-1.5">
               <div className="w-4 h-4 bg-slate-600 rounded flex items-center justify-center">
                 <Building2 className="h-2.5 w-2.5 text-white" />
               </div>
               <span className="text-xs text-gray-600">Institutions</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-slate-700 rounded flex items-center justify-center">
-                <Building2 className="h-2.5 w-2.5 text-white" />
-              </div>
-              <span className="text-xs text-gray-700 font-semibold">UH Hospitals</span>
             </div>
           </div>
         </div>

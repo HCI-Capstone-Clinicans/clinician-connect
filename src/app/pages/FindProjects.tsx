@@ -343,70 +343,75 @@ export default function FindProjects() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
+    <div className="flex flex-col h-screen bg-gray-50">
       <Header />
-      
-      <main className="flex-1">
-        <div className="max-w-7xl mx-auto px-6 py-8">
-          {/* Page Header + Tabs */}
-          <div className="mb-6">
-            <div className="flex items-end justify-between mb-4">
-              <div>
-                <h1 className="text-2xl font-semibold text-gray-900 mb-1">Clinician Connect</h1>
-                <p className="text-[15px] text-gray-500 italic">
-                  A platform to enable interdisciplinary collaboration on healthcare projects
-                </p>
-              </div>
-            </div>
-            <div className="flex gap-1 border-b border-gray-200">
-              <button
-                onClick={() => setActiveTab("browse")}
-                className={`px-4 py-2 text-[13px] font-medium border-b-2 transition-colors -mb-px ${
-                  activeTab === "browse"
-                    ? "border-gray-900 text-gray-900"
-                    : "border-transparent text-gray-500 hover:text-gray-700"
-                }`}
-              >
-                Browse
-              </button>
-              <button
-                onClick={() => setActiveTab("discover")}
-                className={`px-4 py-2 text-[13px] font-medium border-b-2 transition-colors -mb-px ${
-                  activeTab === "discover"
-                    ? "border-gray-900 text-gray-900"
-                    : "border-transparent text-gray-500 hover:text-gray-700"
-                }`}
-              >
-                Discover
-              </button>
-            </div>
+
+      {/* Title + tabs — always visible */}
+      <div className="bg-white border-b border-gray-200 flex-shrink-0">
+        <div className="max-w-7xl mx-auto px-6 pt-6 pb-0">
+          <h1 className="text-2xl font-semibold text-gray-900 mb-1">Clinician Connect</h1>
+          <p className="text-[15px] text-gray-500 italic mb-4">
+            A platform to enable interdisciplinary collaboration on healthcare projects
+          </p>
+          <div className="flex gap-1">
+            <button
+              onClick={() => setActiveTab("browse")}
+              className={`px-4 py-2 text-[13px] font-medium border-b-2 transition-colors -mb-px ${
+                activeTab === "browse"
+                  ? "border-gray-900 text-gray-900"
+                  : "border-transparent text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              Browse
+            </button>
+            <button
+              onClick={() => setActiveTab("discover")}
+              className={`px-4 py-2 text-[13px] font-medium border-b-2 transition-colors -mb-px ${
+                activeTab === "discover"
+                  ? "border-gray-900 text-gray-900"
+                  : "border-transparent text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              Discover
+            </button>
           </div>
+        </div>
+      </div>
 
-          {/* Discover tab */}
-          {activeTab === "discover" && (
-            session
-              ? <DiscoverMap intakeData={null} onEditFilters={() => {}} mode="projects" />
-              : (
-                <div className="flex flex-col items-center justify-center py-24 text-center">
-                  <div className="w-14 h-14 bg-gray-100 border border-gray-200 rounded-full flex items-center justify-center mb-5">
-                    <Lock className="h-6 w-6 text-gray-400" />
-                  </div>
-                  <p className="text-[15px] font-semibold text-gray-900 mb-1">Sign in to use Discover</p>
-                  <p className="text-[13px] text-gray-500 max-w-sm mb-6">
-                    Get personalized project matches based on your skills, interests, and location.
-                  </p>
-                  <Link
-                    to="/login"
-                    className="px-5 py-2.5 bg-gray-900 text-white text-[13px] font-medium rounded-md hover:bg-gray-800 transition-colors"
-                  >
-                    Sign in
-                  </Link>
+      {/* Discover tab — fills remaining height, aligned to page header */}
+      {activeTab === "discover" && (
+        <div className="flex-1 overflow-hidden flex">
+          <div className="w-full max-w-7xl mx-auto px-6 pt-4 pb-6 overflow-hidden flex flex-col">
+          {session
+            ? <DiscoverMap intakeData={null} onEditFilters={() => {}} mode="projects" />
+            : (
+              <div className="flex flex-col items-center justify-center h-full text-center">
+                <div className="w-14 h-14 bg-gray-100 border border-gray-200 rounded-full flex items-center justify-center mb-5">
+                  <Lock className="h-6 w-6 text-gray-400" />
                 </div>
-              )
-          )}
+                <p className="text-[15px] font-semibold text-gray-900 mb-1">Sign in to use Discover</p>
+                <p className="text-[13px] text-gray-500 max-w-sm mb-6">
+                  Get personalized project matches based on your skills, interests, and location.
+                </p>
+                <Link
+                  to="/login"
+                  className="px-5 py-2.5 bg-gray-900 text-white text-[13px] font-medium rounded-md hover:bg-gray-800 transition-colors"
+                >
+                  Sign in
+                </Link>
+              </div>
+            )
+          }
+        </div>
+        </div>
+      )}
 
+      {/* Browse tab — scrollable */}
+      {activeTab === "browse" && (
+      <main className="flex-1 overflow-y-auto">
+        <div className="max-w-7xl mx-auto px-6 py-8">
           {/* Browse tab content */}
-          {activeTab === "browse" && <>
+          <>
 
           {/* Search + Filter bar */}
           <div className="bg-white border border-gray-200 rounded-lg p-4 mb-6">
@@ -628,9 +633,10 @@ export default function FindProjects() {
             ))}
           </div>
 
-          </>}
+          </>
         </div>
       </main>
+      )}
 
       {/* Match Explanation Modal */}
       {contactProject && (
