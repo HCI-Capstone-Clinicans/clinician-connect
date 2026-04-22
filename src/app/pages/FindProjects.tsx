@@ -15,10 +15,6 @@ const SKILL_OPTIONS = [
   "User Research", "Prototyping", "Systems Thinking",
 ];
 
-const INTEREST_OPTIONS = [
-  "Find research collaborators", "Join an existing project", "Start a new initiative",
-  "Share my expertise", "Learn from others", "Validate an idea",
-];
 
 function MultiSelect({
   placeholder,
@@ -180,10 +176,13 @@ interface Project {
   id: string;
   name: string;
   location: string;
+  institutionId: string;
   lab: string;
   description: string;
   tags: string[];
   highlightTag: string;
+  domains: string[];
+  skills: string[];
   piName: string;
   piEmail: string;
   image?: string;
@@ -196,10 +195,9 @@ export default function FindProjects() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
-  const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
   const [selectedInstitution, setSelectedInstitution] = useState("");
-  const [selectedProximity, setSelectedProximity] = useState("");
   const [showMatchExplanation, setShowMatchExplanation] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const { isBookmarked, toggleBookmark } = useBookmarks();
   const [contactProject, setContactProject] = useState<Project | null>(null);
@@ -209,10 +207,13 @@ export default function FindProjects() {
       id: "burnout-prevention",
       name: "Burnout Prevention for Primary Caregivers",
       location: "UH Cleveland Medical Center",
+      institutionId: "uh",
       lab: "Cleveland Art Labs",
       description: "Burnout Prevention is an ongoing research project led by Dr. Susan Stern at University Hospitals Cleveland in conjunction with the Cleveland Institute of Art to develop digital tools to aid caregivers.",
-      tags: ["Robotics", "Human-Robot Interaction", "Surgery Assistance"],
-      highlightTag: "Human-Robot Interaction",
+      tags: ["Healthcare IT", "Wearable Tech", "Caregiver Support"],
+      highlightTag: "Caregiver Support",
+      domains: ["Healthcare IT", "Wearable Tech", "Pediatrics"],
+      skills: ["User Research", "UX Design", "Clinical Research", "Prototyping"],
       piName: "Dr. Susan Stern",
       piEmail: "sstern@uhcleveland.edu",
       matchPercentage: 30,
@@ -221,10 +222,13 @@ export default function FindProjects() {
       id: "smartsuture",
       name: "SmartSuture",
       location: "Case Western Reserve University",
+      institutionId: "cwru",
       lab: "Biomedical Engineering",
       description: "Automated suturing research combining robotics and computer vision to assist in minimally invasive procedures.",
-      tags: ["Robotics", "Computer Vision", "Medical Devices"],
+      tags: ["Robotics", "Medical Devices", "Surgery"],
       highlightTag: "Robotics",
+      domains: ["Surgery", "Medical Devices", "Robotics"],
+      skills: ["Software Development", "Medical Imaging", "Prototyping", "Systems Thinking"],
       piName: "Dr. Rachel Kim",
       piEmail: "rkim@cwru.edu",
       matchPercentage: 68,
@@ -233,11 +237,14 @@ export default function FindProjects() {
       id: "robodog",
       name: "RoboDog",
       location: "UH Cleveland Medical Center",
+      institutionId: "uh",
       lab: "Carroll Labs",
       description: "RoboDog is an ongoing research project led by Dr. Bryan Carroll at University Hospitals Cleveland to develop robotic dogs to assist in dermatologic surgery.",
-      tags: ["Robotics", "Human-Robot Interaction", "Surgery Assistance"],
+      tags: ["Robotics", "Surgery", "Human-Robot Interaction"],
       highlightTag: "Human-Robot Interaction",
       image: imgRobot,
+      domains: ["Robotics", "Surgery", "Medical Devices"],
+      skills: ["Prototyping", "Software Development", "User Research", "Systems Thinking"],
       piName: "Dr. Bryan Carroll",
       piEmail: "bcarroll@uhcleveland.edu",
       matchPercentage: 87,
@@ -246,38 +253,43 @@ export default function FindProjects() {
       id: "medassist",
       name: "MedAssist AI",
       location: "Cleveland Clinic",
+      institutionId: "clinic",
       lab: "Digital Health Innovation Lab",
       description: "AI-powered surgical assistance platform that enhances precision and reduces operation time through real-time analytics and decision support.",
-      tags: ["AI/ML", "Surgery Assistance", "Medical Devices"],
-      highlightTag: "Surgery Assistance",
+      tags: ["AI/ML", "Surgery", "Medical Devices"],
+      highlightTag: "AI/ML",
+      domains: ["AI/ML", "Surgery", "Healthcare IT"],
+      skills: ["Machine Learning", "Data Analysis", "Software Development", "Clinical Research"],
       piName: "Dr. Angela Foster",
       piEmail: "afoster@clevelandclinic.org",
       matchPercentage: 72,
     },
   ];
 
-  // Check if any search/filter is active
-  const hasActiveSearch = searchQuery || selectedDomains.length || selectedSkills.length || selectedInterests.length || selectedInstitution || selectedProximity;
+  const hasActiveSearch = searchQuery || selectedDomains.length || selectedSkills.length || selectedInstitution;
+
+  const scoreProject = (project: Project): number => {
+    const domainMatches = selectedDomains.filter(d => project.domains.includes(d)).length;
+    const skillMatches = selectedSkills.filter(s => project.skills.includes(s)).length;
+    return domainMatches + skillMatches;
+  };
 
   const filteredProjects = projects.filter(project => {
-    if (selectedDomains.length && !selectedDomains.some(d => project.tags.some(t => t.toLowerCase().includes(d.toLowerCase())))) {
-      return false;
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      const inName = project.name.toLowerCase().includes(q);
+      const inDesc = project.description.toLowerCase().includes(q);
+      const inTags = project.tags.some(t => t.toLowerCase().includes(q));
+      if (!inName && !inDesc && !inTags) return false;
     }
-    if (selectedSkills.length && !selectedSkills.some(s => project.tags.some(t => t.toLowerCase().includes(s.toLowerCase())))) {
-      return false;
-    }
-    if (selectedInterests.length && !selectedInterests.some(i => project.tags.some(t => t.toLowerCase().includes(i.toLowerCase())))) {
-      return false;
-    }
-    if (searchQuery && !project.name.toLowerCase().includes(searchQuery.toLowerCase())) {
-      return false;
-    }
+    if (selectedInstitution && project.institutionId !== selectedInstitution) return false;
+    if ((selectedDomains.length || selectedSkills.length) && scoreProject(project) === 0) return false;
     return true;
   });
 
-  // Only sort by match percentage when there's an active search/filter
-  const displayedProjects = hasActiveSearch 
-    ? [...filteredProjects].sort((a, b) => b.matchPercentage - a.matchPercentage)
+  // Relevance sort: most domain+skill matches first; fall back to original order
+  const displayedProjects = hasActiveSearch && (selectedDomains.length || selectedSkills.length)
+    ? [...filteredProjects].sort((a, b) => scoreProject(b) - scoreProject(a))
     : filteredProjects;
 
   const handleShowMatch = (project: Project) => {
@@ -396,78 +408,69 @@ export default function FindProjects() {
           {/* Browse tab content */}
           {activeTab === "browse" && <>
 
-          {/* Advanced Search Filters */}
-          <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
-              {/* Domains */}
-              <MultiSelect
-                placeholder="Domains"
-                options={DOMAIN_OPTIONS}
-                selected={selectedDomains}
-                onChange={setSelectedDomains}
-              />
-
-              {/* Skills */}
-              <MultiSelect
-                placeholder="Skills"
-                options={SKILL_OPTIONS}
-                selected={selectedSkills}
-                onChange={setSelectedSkills}
-              />
-
-              {/* Interests */}
-              <MultiSelect
-                placeholder="Interests"
-                options={INTEREST_OPTIONS}
-                selected={selectedInterests}
-                onChange={setSelectedInterests}
-              />
-
-              {/* Institution */}
-              <SingleSelect
-                placeholder="Institution"
-                value={selectedInstitution}
-                onChange={setSelectedInstitution}
-                options={[
-                  { label: "UH Cleveland Medical Center", value: "uh" },
-                  { label: "Cleveland Clinic", value: "clinic" },
-                  { label: "Case Western Reserve University", value: "cwru" },
-                ]}
-              />
-
-              {/* Proximity */}
-              <SingleSelect
-                placeholder="Proximity"
-                value={selectedProximity}
-                onChange={setSelectedProximity}
-                options={[
-                  { label: "Within 5 miles", value: "5" },
-                  { label: "Within 10 miles", value: "10" },
-                  { label: "Within 25 miles", value: "25" },
-                  { label: "Any distance", value: "any" },
-                ]}
-              />
-
-              {/* Keyword Search */}
-              <div className="relative md:col-span-2 lg:col-span-2">
+          {/* Search + Filter bar */}
+          <div className="bg-white border border-gray-200 rounded-lg p-4 mb-6">
+            {/* Row: search left, filters button right */}
+            <div className="flex gap-3 mb-3">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Keyword search..."
+                  placeholder="Search projects..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full px-3 py-2 text-[13px] border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full pl-9 pr-4 py-2 text-[13px] border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
-
-              {/* Search Button */}
-              <button className="md:col-span-2 lg:col-span-1 px-4 py-2 bg-gray-900 text-white text-[13px] font-medium rounded-md hover:bg-gray-800 transition-colors flex items-center justify-center gap-2">
-                <Search className="h-4 w-4" />
-                Search
+              <button
+                onClick={() => setShowFilters(f => !f)}
+                className={`flex items-center gap-2 px-4 py-2 text-[13px] font-medium rounded-md border transition-colors ${
+                  showFilters || selectedDomains.length || selectedSkills.length || selectedInstitution
+                    ? "bg-gray-900 text-white border-gray-900"
+                    : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                }`}
+              >
+                <ChevronDown className={`h-4 w-4 transition-transform ${showFilters ? "rotate-180" : ""}`} />
+                Filters
+                {(selectedDomains.length + selectedSkills.length + (selectedInstitution ? 1 : 0)) > 0 && (
+                  <span className="ml-1 px-1.5 py-0.5 bg-white text-gray-900 text-[10px] font-bold rounded-full">
+                    {selectedDomains.length + selectedSkills.length + (selectedInstitution ? 1 : 0)}
+                  </span>
+                )}
               </button>
             </div>
 
+            {/* Collapsible filter panel */}
+            {showFilters && (
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 pt-3 border-t border-gray-200">
+                <SingleSelect
+                  placeholder="Institution"
+                  value={selectedInstitution}
+                  onChange={setSelectedInstitution}
+                  options={[
+                    { label: "UH Cleveland Medical Center", value: "uh" },
+                    { label: "Cleveland Clinic", value: "clinic" },
+                    { label: "Case Western Reserve University", value: "cwru" },
+                  ]}
+                />
+                <MultiSelect
+                  placeholder="Skills"
+                  options={SKILL_OPTIONS}
+                  selected={selectedSkills}
+                  onChange={setSelectedSkills}
+                />
+                <MultiSelect
+                  placeholder="Domains"
+                  options={DOMAIN_OPTIONS}
+                  selected={selectedDomains}
+                  onChange={setSelectedDomains}
+                />
+              </div>
+            )}
+
+
             {/* Active Filters */}
-            {(selectedDomains.length > 0 || selectedSkills.length > 0 || selectedInterests.length > 0 || selectedInstitution || selectedProximity) && (
+            {(selectedDomains.length > 0 || selectedSkills.length > 0 || selectedInstitution) && (
               <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-gray-200">
                 <span className="text-[11px] text-gray-500 font-medium">Active filters:</span>
                 {selectedDomains.map(d => (
@@ -482,12 +485,6 @@ export default function FindProjects() {
                     <button onClick={() => setSelectedSkills(selectedSkills.filter(v => v !== s))} className="hover:bg-purple-100 rounded"><X className="h-3 w-3" /></button>
                   </span>
                 ))}
-                {selectedInterests.map(i => (
-                  <span key={i} className="px-2 py-1 bg-green-50 text-green-700 text-[11px] font-medium rounded-md border border-green-200 flex items-center gap-1">
-                    {i}
-                    <button onClick={() => setSelectedInterests(selectedInterests.filter(v => v !== i))} className="hover:bg-green-100 rounded"><X className="h-3 w-3" /></button>
-                  </span>
-                ))}
                 {selectedInstitution && (
                   <span className="px-2 py-1 bg-orange-50 text-orange-700 text-[11px] font-medium rounded-md border border-orange-200 flex items-center gap-1">
                     {[
@@ -496,17 +493,6 @@ export default function FindProjects() {
                       { label: "Case Western Reserve University", value: "cwru" },
                     ].find(o => o.value === selectedInstitution)?.label}
                     <button onClick={() => setSelectedInstitution("")} className="hover:bg-orange-100 rounded"><X className="h-3 w-3" /></button>
-                  </span>
-                )}
-                {selectedProximity && (
-                  <span className="px-2 py-1 bg-orange-50 text-orange-700 text-[11px] font-medium rounded-md border border-orange-200 flex items-center gap-1">
-                    {[
-                      { label: "Within 5 miles", value: "5" },
-                      { label: "Within 10 miles", value: "10" },
-                      { label: "Within 25 miles", value: "25" },
-                      { label: "Any distance", value: "any" },
-                    ].find(o => o.value === selectedProximity)?.label}
-                    <button onClick={() => setSelectedProximity("")} className="hover:bg-orange-100 rounded"><X className="h-3 w-3" /></button>
                   </span>
                 )}
               </div>
@@ -559,15 +545,19 @@ export default function FindProjects() {
                           >
                             {project.name}
                           </Link>
-                          {hasActiveSearch && (
-                            <button
-                              onClick={() => handleShowMatch(project)}
-                              className="px-2 py-1 bg-gradient-to-r from-green-50 to-blue-50 text-green-700 text-[11px] font-semibold rounded-md border border-green-200 hover:border-green-300 transition-all flex items-center gap-1"
-                            >
-                              <TrendingUp className="h-3 w-3" />
-                              {project.matchPercentage}% Match
-                            </button>
-                          )}
+                          {hasActiveSearch && (selectedDomains.length > 0 || selectedSkills.length > 0) && (() => {
+                            const total = selectedDomains.length + selectedSkills.length;
+                            const matched = scoreProject(project);
+                            return matched > 0 ? (
+                              <button
+                                onClick={() => handleShowMatch(project)}
+                                className="px-2 py-1 bg-gradient-to-r from-green-50 to-blue-50 text-green-700 text-[11px] font-semibold rounded-md border border-green-200 hover:border-green-300 transition-all flex items-center gap-1"
+                              >
+                                <TrendingUp className="h-3 w-3" />
+                                {matched}/{total} filters match
+                              </button>
+                            ) : null;
+                          })()}
                         </div>
                         <p className="text-[13px] text-gray-600">{project.lab}</p>
                       </div>
