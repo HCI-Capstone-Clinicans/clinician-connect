@@ -11,10 +11,10 @@ import { ContactModal } from "../components/ContactModal";
 
 const MIN_SCALE = 0.45;
 const MAX_SCALE = 3.0;
-const FIT_SCALE_4 = 0.64;
-const FIT_SCALE_5 = 0.62;
-const BASE_OFFSET_4 = { x: 0, y: -24 };
-const BASE_OFFSET_5 = { x: -22, y: -82 };
+const FIT_SCALE_4 = 0.7;
+const FIT_SCALE_5 = 0.64;
+const BASE_OFFSET_4 = { x: 0, y: -18 };
+const BASE_OFFSET_5 = { x: -18, y: -76 };
 
 export default function SkillsMap() {
   const navigate = useNavigate();
@@ -249,7 +249,7 @@ export default function SkillsMap() {
 
             {/* Venn Diagram */}
             <div className="flex-1 min-h-0">
-              <div className="relative bg-white border border-gray-200 rounded-lg h-[640px] overflow-hidden pb-4">
+              <div className="relative bg-white border border-gray-200 rounded-lg h-[580px] overflow-hidden">
                 {/* Venn Diagram Container (fills panel including header region) */}
                 <div
                   ref={containerRef}
